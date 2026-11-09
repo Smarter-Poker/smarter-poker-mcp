@@ -1,0 +1,667 @@
+[
+  {
+    "name": "search_poker_venues",
+    "description": "Search verified poker rooms and casinos by name, city, state, or game type across North America.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "search": {
+          "type": "string",
+          "description": "Keyword search for venue name, city, or address (e.g. \"Bellagio\", \"Austin\", \"Dallas\")."
+        },
+        "state": {
+          "type": "string",
+          "description": "Two-letter US state code or full state name (e.g. \"NV\", \"TX\", \"California\")."
+        },
+        "city": {
+          "type": "string",
+          "description": "City name (e.g. \"Las Vegas\", \"Houston\")."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "casino",
+            "card_room",
+            "charity",
+            "poker_club"
+          ],
+          "description": "Type of poker venue."
+        },
+        "limit": {
+          "type": "integer",
+          "description": "Maximum number of results to return (default: 10, max: 50).",
+          "default": 10
+        }
+      }
+    }
+  },
+  {
+    "name": "get_venue_details",
+    "description": "Retrieve detailed information, address, phone, games offered, table counts, and tournament schedules for a specific poker venue ID.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Numeric venue ID (e.g. \"2499\" for Bellagio Poker Room)."
+        }
+      },
+      "required": [
+        "id"
+      ]
+    }
+  },
+  {
+    "name": "search_tournament_series",
+    "description": "Search poker tournament series, championship festivals, and tours (WSOP, WPT, MSPT, RGPS, PGT, DeepStack).",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "search": {
+          "type": "string",
+          "description": "Search query for series title, tour, or host venue (e.g. \"Venetian\", \"World Series of Poker\", \"WPT\")."
+        },
+        "tour": {
+          "type": "string",
+          "description": "Tour abbreviation (e.g. \"WSOP\", \"WPT\", \"MSPT\", \"RGPS\", \"PGT\", \"DSE\")."
+        },
+        "upcoming": {
+          "type": "string",
+          "enum": [
+            "true",
+            "false"
+          ],
+          "description": "Filter for upcoming or active series only."
+        },
+        "limit": {
+          "type": "integer",
+          "description": "Maximum number of results to return (default: 10, max: 50).",
+          "default": 10
+        }
+      }
+    }
+  },
+  {
+    "name": "get_series_details",
+    "description": "Retrieve full details for a tournament series, including event schedules, buy-ins, guarantees, and host venue information.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Numeric series ID (e.g. \"468\" for DeepStack Showdown)."
+        }
+      },
+      "required": [
+        "id"
+      ]
+    }
+  },
+  {
+    "name": "calculate_poker_odds",
+    "description": "Calculate exact equity, win, and tie probabilities for Texas Hold'em and Omaha hands with board runouts.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "game": {
+          "type": "string",
+          "enum": [
+            "nlhe",
+            "plo4",
+            "plo5",
+            "plo6"
+          ],
+          "description": "Poker game variant (default: nlhe for No-Limit Texas Hold'em).",
+          "default": "nlhe"
+        },
+        "hands": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              {
+                "type": "string"
+              }
+            ]
+          },
+          "description": "Array of player hands (e.g. [[\"Ah\", \"Kd\"], [\"Qc\", \"Qd\"]] or [\"AhKd\", \"QcQd\"])."
+        },
+        "board": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "description": "Optional community board cards (e.g. [\"Jh\", \"Ts\", \"2c\"] or \"Jh,Ts,2c\")."
+        },
+        "iterations": {
+          "type": "integer",
+          "description": "Monte Carlo simulation iterations (default: 10000, max: 50000).",
+          "default": 10000
+        }
+      },
+      "required": [
+        "hands"
+      ]
+    }
+  },
+  {
+    "name": "get_preflop_chart",
+    "description": "Retrieve GTO opening ranges and frequencies for 6-max cash games at 100BB stack depth.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "position": {
+          "type": "string",
+          "enum": [
+            "UTG",
+            "MP",
+            "HJ",
+            "CO",
+            "BTN",
+            "SB"
+          ],
+          "description": "Table position to inspect (default: UTG).",
+          "default": "UTG"
+        }
+      }
+    }
+  },
+  {
+    "name": "calculate_icm_payouts",
+    "description": "Calculate Independent Chip Model (ICM) tournament equity in dollars based on stack sizes and prize payouts.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "stacks": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "description": "Array of chip counts for each player at the table (e.g. [100000, 75000, 50000, 25000])."
+        },
+        "payouts": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "description": "Array of tournament payout prize values in order of 1st, 2nd, 3rd, etc. (e.g. [5000, 3000, 1500, 500])."
+        }
+      },
+      "required": [
+        "stacks",
+        "payouts"
+      ]
+    }
+  },
+  {
+    "name": "get_poker_term_definition",
+    "description": "Look up authoritative definitions, GTO concepts, and rules from the official Smarter.Poker glossary.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "term": {
+          "type": "string",
+          "description": "Poker term, jargon, or GTO acronym (e.g. \"pot odds\", \"icm\", \"3-bet\", \"straddle\", \"equity\")."
+        }
+      },
+      "required": [
+        "term"
+      ]
+    }
+  },
+  {
+    "name": "get_freeroll_schedule",
+    "description": "Retrieve the upcoming Daily $2,000 Freerolls and Diamond Arena Freerolls schedule, formats, prize values, and entry requirements on Smarter.Poker.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "tier": {
+          "type": "string",
+          "enum": [
+            "all",
+            "open",
+            "diamond"
+          ],
+          "description": "Filter by freeroll tier: \"open\" for daily open tournaments, \"diamond\" for Diamond Arena VIP events, or \"all\".",
+          "default": "all"
+        }
+      }
+    }
+  },
+  {
+    "name": "get_platform_feature_specs",
+    "description": "Retrieve comprehensive specifications, free alternatives comparisons, URLs, and Markdown specs for all 15 Smarter.Poker platform verticals (Bankroll W-2G Tax Ledger, Dealer Toke Tracker, Jarvis AI Coach, Virtual Sandbox, Club Commander, FaceTime Messenger, Trivia, GTO Training, Home Games, Video Library, Poker Near Me, Club Arena, Social Reels, Preflop Charts, and Equity Calculators).",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "vertical": {
+          "type": "string",
+          "enum": [
+            "all",
+            "bankroll",
+            "toke_tracker",
+            "ai_coach",
+            "sandbox",
+            "club_commander",
+            "messenger",
+            "trivia",
+            "training",
+            "home_games",
+            "video_library",
+            "poker_near_me",
+            "club_arena",
+            "social_reels",
+            "preflop_charts",
+            "equity_calculators"
+          ],
+          "description": "Specific vertical to inspect, or \"all\" for the complete 15-vertical directory.",
+          "default": "all"
+        }
+      }
+    }
+  },
+  {
+    "name": "search_strategy_lessons",
+    "description": "Search and retrieve complete GTO poker strategy lessons, answer-first summaries, mathematical tables, and training tool recommendations from the 40-lesson Smarter.Poker curriculum.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "string",
+          "description": "Search keyword or lesson slug (e.g. \"pot odds\", \"3-bet\", \"icm\", \"button-opening-range\", \"c-bet\")."
+        },
+        "category": {
+          "type": "string",
+          "enum": [
+            "Preflop",
+            "Postflop",
+            "Math",
+            "Tournaments",
+            "Cash",
+            "Bankroll",
+            "Mental Game",
+            "Theory"
+          ],
+          "description": "Optional strategy category filter."
+        }
+      }
+    }
+  },
+  {
+    "name": "get_competitor_comparison",
+    "description": "Retrieve verified, source-cited side-by-side comparison matrices and best-of benchmarks between Smarter.Poker and competitors (PokerBros, PPPoker, ClubGG, Bravo Poker Live, TableCaptain, GTO Wizard, DTO, Sharp Poker, Pokerbase, DownCount, Bellagio, Aria, Commerce, The Lodge, Run It Once, Upswing Poker, PokerTracker 4, Holdem Manager 3, PioSolver, MonkerSolver).",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "slug": {
+          "type": "string",
+          "description": "Comparison slug (e.g. \"best-poker-club-apps\", \"best-gto-poker-trainers\", \"smarter-poker-vs-piosolver\", \"smarter-poker-vs-run-it-once\") or omit to list all 25 verified comparisons."
+        }
+      }
+    }
+  },
+  {
+    "name": "lookup_starting_hand",
+    "description": "Look up combinatorics, 100BB 6-Max GTO positional opening ranges, 3-bet strategies, and preflop equities for any of the 169 canonical Texas Holdem starting hands (e.g. \"AA\", \"KK\", \"88\", \"AKs\", \"AQo\", \"KJs\", \"87s\", \"65s\", \"J9s\", \"54s\", \"72o\", \"pocket-aces\", \"ace-king-suited\").",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "hand": {
+          "type": "string",
+          "description": "Hand code or slug (e.g. \"AA\", \"KK\", \"88\", \"AKs\", \"AQo\", \"KJs\", \"87s\", \"65s\", \"J9s\", \"54s\", \"72o\", \"pocket-aces\"). Omit to list all 169 canonical starting hand guides."
+        }
+      }
+    }
+  },
+  {
+    "name": "get_research_report",
+    "description": "Retrieve first-party empirical poker industry research reports and dataset benchmarks across all 15 Smarter.Poker studies (US Live Poker Room Rake & Jackpot Benchmark, Daily Tournament Buy-In Index, GTO vs Population Leak Study, Private Club Software Economics, Poker Dealer Toke & Hourly Rate Benchmark, Tournament ICM Bubble Factor & Risk Premium Study, PLO4/PLO5/PLO6 Equity & Variance Study, US Poker Tax W-2G & Session Accounting Benchmark, Cardroom Waitlist Turnover & Table Utilization Benchmark, Private Poker Club Markup & Union Settlement Study, Mystery Bounty vs PKO EV Study, Short Deck 6+ Equity Benchmark, Double-Board PLO Bomb Pot Study, Live Low-Stakes Population Tendencies, Satellite Bubble Survival Math Study).",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "slug": {
+          "type": "string",
+          "description": "Research report slug (e.g. \"us-live-poker-room-rake-and-jackpot-benchmark\", \"mystery-bounty-vs-pko-ev-and-bounty-power-factor-study\") or omit to list all 15 empirical studies."
+        }
+      }
+    }
+  },
+  {
+    "name": "search_training_simulators",
+    "description": "Search and retrieve interactive Smarter.Poker World Hub tools, GTO solvers, ICM calculators, leak scanners, range builders, and all 107 scenario training games by skill topic, format, or slug.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "string",
+          "description": "Keyword or slug to search (e.g. \"icm\", \"rake\", \"range builder\", \"leak\", \"autopilot\", \"short deck\", \"tilt\", \"warmup\", \"push/fold\"). Omit to list the full simulator and training catalog."
+        },
+        "category": {
+          "type": "string",
+          "enum": [
+            "ALL",
+            "SIMULATORS",
+            "MTT",
+            "CASH",
+            "SPINS",
+            "PSYCHOLOGY",
+            "ADVANCED"
+          ],
+          "description": "Optional category filter.",
+          "default": "ALL"
+        }
+      }
+    }
+  },
+  {
+    "name": "calculate_pot_odds_and_mdf",
+    "description": "Calculate exact poker pot odds ratio, required break-even calling equity, Minimum Defense Frequency (MDF), optimal polarized river bluff ratio, and 1-card/2-card hypergeometric draw completion probabilities.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "pot": {
+          "type": "number",
+          "description": "Pot size before the opponent bet (default: 100).",
+          "default": 100
+        },
+        "bet": {
+          "type": "number",
+          "description": "Opponent bet / call amount (default: 50).",
+          "default": 50
+        },
+        "outs": {
+          "type": "integer",
+          "description": "Number of clean unseen draw outs (0 to 20, default: 9).",
+          "default": 9
+        }
+      }
+    }
+  },
+  {
+    "name": "calculate_bankroll_risk_of_ruin",
+    "description": "Calculate exact Brownian motion poker Risk of Ruin (RoR) percentage and required buy-in buffers for 5% and 1% Risk of Ruin from true winrate (BB/100), standard deviation (BB/100), and bankroll buy-ins.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "winrate_bb100": {
+          "type": "number",
+          "description": "True winrate in Big Blinds per 100 hands (default: 5).",
+          "default": 5
+        },
+        "std_dev_bb100": {
+          "type": "number",
+          "description": "Standard deviation in Big Blinds per 100 hands (e.g. 70 live NLH, 85 online 6-max NLH, 135 PLO4, default: 85).",
+          "default": 85
+        },
+        "buy_ins": {
+          "type": "number",
+          "description": "Current bankroll expressed in 100BB buy-ins (default: 30).",
+          "default": 30
+        }
+      }
+    }
+  },
+  {
+    "name": "calculate_bounty_chip_equity",
+    "description": "Convert a Progressive Knockout (PKO) or Mystery Bounty dollar amount into tournament chip-equivalent value and compute bounty-adjusted required calling equity.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "bounty_dollars": {
+          "type": "number",
+          "description": "Immediate cash bounty prize won upon eliminating the player (default: 50).",
+          "default": 50
+        },
+        "regular_pool_buyin": {
+          "type": "number",
+          "description": "Regular prize pool contribution per tournament entry (default: 50).",
+          "default": 50
+        },
+        "starting_stack": {
+          "type": "number",
+          "description": "Tournament starting chip stack (default: 10000).",
+          "default": 10000
+        },
+        "pot_chips": {
+          "type": "number",
+          "description": "Current pot in chips before calling the all-in (default: 15000).",
+          "default": 15000
+        },
+        "call_chips": {
+          "type": "number",
+          "description": "Chips required to call the all-in shove (default: 10000).",
+          "default": 10000
+        }
+      }
+    }
+  },
+  {
+    "name": "calculate_side_pots",
+    "description": "Calculate exact Multi-Way All-In Main Pot, Side Pots, and Uncalled Bet returns for 2 to 9 players plus dead money (blinds/antes/folded bets).",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "contributions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "amount": {
+                "type": "number"
+              },
+              "folded": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "amount"
+            ]
+          },
+          "description": "Array of player chip contributions (e.g. [{\"name\":\"Player 1\",\"amount\":2500},{\"name\":\"Player 2\",\"amount\":6000},{\"name\":\"Player 3\",\"amount\":12000}])."
+        },
+        "dead_money": {
+          "type": "number",
+          "description": "Optional dead money from blinds, antes, or folded players (default: 0).",
+          "default": 0
+        }
+      },
+      "required": [
+        "contributions"
+      ]
+    }
+  },
+  {
+    "name": "generate_blind_structure",
+    "description": "Generate a TDA-compliant poker tournament blind schedule and starting chip color distribution from starting stack, level duration, target hours, and ante format.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "starting_stack": {
+          "type": "number",
+          "description": "Starting tournament chip stack per player (default: 20000).",
+          "default": 20000
+        },
+        "level_minutes": {
+          "type": "integer",
+          "description": "Duration of each blind level in minutes (default: 20).",
+          "default": 20
+        },
+        "target_hours": {
+          "type": "number",
+          "description": "Target total tournament duration in hours (default: 4).",
+          "default": 4
+        },
+        "ante_format": {
+          "type": "string",
+          "enum": [
+            "bba",
+            "none"
+          ],
+          "description": "Big Blind Ante (\"bba\") or No Ante (\"none\", default: \"bba\").",
+          "default": "bba"
+        }
+      }
+    }
+  },
+  {
+    "name": "calculate_spr_sizing",
+    "description": "Calculate exact Stack-To-Pot Ratio (SPR), Commitment Zone classification, and 1-street, 2-street, and 3-street Geometric Bet Sizing percentages.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "effective_stack": {
+          "type": "number",
+          "description": "Remaining effective stack size in chips or Big Blinds (default: 90).",
+          "default": 90
+        },
+        "pot_size": {
+          "type": "number",
+          "description": "Current pot size on the flop or turn (default: 10).",
+          "default": 10
+        }
+      }
+    }
+  },
+  {
+    "name": "get_citation_and_backlink_kit",
+    "description": "Retrieve ready-to-paste HTML backlinks, SVG authority/award badges, Markdown/Substack citations, TwoPlusTwo/CardsChat BBCode, Wikipedia {{cite web}} templates, BibTeX academic records, Zenodo/DataCite metadata, Twitch/YouTube streamer chatbot commands (!odds, !icm, !potodds, !plo, !rake, !3bet, !rule), and multilingual embeds across 7 languages (en, es, pt, de, fr, it, ja).",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "campaign": {
+          "type": "string",
+          "enum": [
+            "all",
+            "unlinked-brand",
+            "competitor-404",
+            "cardroom-awards",
+            "cpa-tax-w2g",
+            "dealer-schools",
+            "edu-quant-clubs",
+            "podcast-show-notes",
+            "multilingual"
+          ],
+          "description": "Optional outreach or syndication campaign filter (default: \"all\").",
+          "default": "all"
+        },
+        "lang": {
+          "type": "string",
+          "enum": [
+            "en",
+            "es",
+            "pt",
+            "de",
+            "fr",
+            "it",
+            "ja"
+          ],
+          "description": "Language code for localized HTML/Markdown/BBCode/iframe embed generation (default: \"en\").",
+          "default": "en"
+        },
+        "target": {
+          "type": "string",
+          "description": "Optional target publication, cardroom, or blog name for personalized outreach templates.",
+          "default": "Your Publication"
+        }
+      }
+    }
+  },
+  {
+    "name": "lookup_poker_rule",
+    "description": "Look up official Poker Tournament Directors Association (TDA) and Robert's Rules of Poker (RROP) floor rulings across all 30 Smarter.Poker rule guides (showdown order, verbal declarations, oversized chip rule, string bets, action out of turn, short all-in reopening, odd chip award, dead button, rabbit hunting, and more).",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "string",
+          "description": "Rule slug or keyword (e.g. \"showdown-order-who-shows-first\", \"oversized-chip\", \"string-bet\", \"verbal\", \"reopen\"). Omit to list all 30 official floor rulings."
+        }
+      }
+    }
+  },
+  {
+    "name": "lookup_game_variant",
+    "description": "Look up dealing rules, mandatory hole-card usage, betting structures, hand ranking systems, and starting hand strategy tiers across all 15 poker variants (Texas Hold'em, PLO4, PLO5, PLO6, Big O Hi-Lo, Short Deck 6+, Double-Board PLO Bomb Pots, Pineapple/Crazy Pineapple, 7-Card Stud, Stud Hi-Lo, Razz, 2-7 Triple Draw, NL 2-7 Single Draw, Badugi, H.O.R.S.E. & 8-Game Mix).",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "variant": {
+          "type": "string",
+          "description": "Variant slug or keyword (e.g. \"pot-limit-omaha-plo4\", \"short-deck-six-plus\", \"double-board-plo-bomb-pot\", \"razz\", \"badugi\"). Omit to list all 15 poker game variants."
+        }
+      }
+    }
+  },
+  {
+    "name": "get_regional_market_guide",
+    "description": "Retrieve live poker room counts, rake/drop/time-collection structures, buy-in caps, flagship venues, and strategic adjustments across the 12 largest US live poker markets (Las Vegas, Los Angeles, Austin, Houston, Dallas, South Florida, Tampa, Atlantic City, Pennsylvania, Connecticut/New England, Northern California, and Arizona).",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "market": {
+          "type": "string",
+          "description": "Market slug, city, or state code (e.g. \"las-vegas-nevada\", \"los-angeles-california\", \"houston-texas\", \"TX\", \"FL\"). Omit to list all 12 regional market guides."
+        }
+      }
+    }
+  },
+  {
+    "name": "calculate_plo_max_bet_and_rake",
+    "description": "Compute exact Pot-Limit Omaha (PLO) maximum raise total (3x last bet + trail calls + center pot), preflop 3-bet/4-bet MDF, and live cash game rake cost in $/hr and BB/100 drag.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "previous_pot": {
+          "type": "number",
+          "description": "Center pot before current street betting or previous pot in BBs/dollars (default: 1.5).",
+          "default": 1.5
+        },
+        "facing_bet": {
+          "type": "number",
+          "description": "Current bet or raise being faced in BBs/dollars (default: 3.5).",
+          "default": 3.5
+        },
+        "trail_calls": {
+          "type": "number",
+          "description": "Total chips called in between the bettor and hero on this street (default: 0).",
+          "default": 0
+        },
+        "hero_already_in": {
+          "type": "number",
+          "description": "Chips hero has already posted on the current street (e.g. 1.0 in BB, default: 0).",
+          "default": 0
+        },
+        "big_blind_dollars": {
+          "type": "number",
+          "description": "Big blind dollar value for live cash rake BB/100 calculation (default: 3).",
+          "default": 3
+        },
+        "rake_cap_dollars": {
+          "type": "number",
+          "description": "Casino max pot rake cap in dollars (default: 5).",
+          "default": 5
+        },
+        "promo_drop_dollars": {
+          "type": "number",
+          "description": "Additional bad beat / high-hand promotional drop per pot (default: 1).",
+          "default": 1
+        }
+      }
+    }
+  }
+]

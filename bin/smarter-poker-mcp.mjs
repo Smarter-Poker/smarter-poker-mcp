@@ -3,76 +3,29 @@
  * Smarter.Poker Model Context Protocol (MCP) Server — Stdio & Remote Bridge
  *
  * Connects local MCP clients (Claude Desktop, Cursor, Windsurf, VS Code, Zed)
- * over standard input/output (JSON-RPC 2.0) to the Smarter.Poker MCP engine
- * (https://smarter.poker/api/mcp) with built-in deterministic local fallback
- * solvers for core poker mathematics (Pot Odds, MDF, Malmuth-Harville ICM,
- * and Pot-Limit Omaha max-bet sizing).
+ * and Docker introspection runners (Glama, Smithery) over standard input/output
+ * (JSON-RPC 2.0) to the Smarter.Poker MCP engine (https://smarter.poker/api/mcp)
+ * with embedded 26-tool schemas (`bin/tools-schema.json`) and deterministic
+ * local fallback solvers for core poker mathematics.
  */
 
+import fs from 'node:fs';
 import readline from 'node:readline';
 
 const REMOTE_ENDPOINT = process.env.SMARTER_POKER_MCP_URL || 'https://smarter.poker/api/mcp';
 const SERVER_INFO = {
   name: 'smarter-poker-mcp-server',
-  version: '1.0.0',
+  version: '1.0.1',
 };
 
-const FALLBACK_TOOLS = [
-  {
-    name: 'calculate_pot_odds_and_mdf',
-    description:
-      'Calculate exact poker pot odds ratio, required break-even calling equity %, Minimum Defense Frequency (MDF %), and rule-of-4/2 draw equity.',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        pot: { type: 'number', description: 'Current pot size before the bet' },
-        bet: { type: 'number', description: 'Bet size facing the player' },
-        outs: { type: 'number', description: 'Optional number of clean outs (0-20)' },
-      },
-      required: ['pot', 'bet'],
-    },
-  },
-  {
-    name: 'calculate_plo_pot_limit_bet',
-    description:
-      'Calculate the exact maximum legal pot-limit raise in Pot-Limit Omaha (PLO) using the 3 * call + pot + dead_money formula.',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        pot: { type: 'number', description: 'Current pot before the bet to call' },
-        call: { type: 'number', description: 'Current bet facing the active player' },
-        dead: { type: 'number', description: 'Additional dead money or posted blinds in the pot' },
-      },
-      required: ['pot', 'call'],
-    },
-  },
-  {
-    name: 'calculate_icm_equity',
-    description:
-      'Compute exact Malmuth-Harville Independent Chip Model (ICM) tournament dollar equity ($EV) for up to 9 stack sizes and a payout structure.',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        stacks: {
-          type: 'array',
-          items: { type: 'number' },
-          description: 'Array of player chip stacks (e.g. [50000, 30000, 20000])',
-        },
-        payouts: {
-          type: 'array',
-          items: { type: 'number' },
-          description: 'Array of prize payouts (e.g. [5000, 3000, 2000])',
-        },
-      },
-      required: ['stacks', 'payouts'],
-    },
-  },
-];
+const TOOLS_SCHEMA = JSON.parse(
+  fs.readFileSync(new URL('./tools-schema.json', import.meta.url), 'utf8')
+);
 
 function computeLocalFallback(name, args = {}) {
-  if (name === 'calculate_pot_odds_and_mdf') {
+  if (name === 'calculate_pot_odds_and_mdf' || name === 'calculate_poker_odds') {
     const pot = Number(args.pot) || 100;
-    const bet = Number(args.bet) || 50;
+    const bet = Number(args.bet || args.call) || 50;
     const outs = Number(args.outs) || 0;
     const totalPotAfterCall = pot + bet * 2;
     const reqEquity = (bet / totalPotAfterCall) * 100;
@@ -104,7 +57,7 @@ function computeLocalFallback(name, args = {}) {
       canonicalUrl: `https://smarter.poker/tools/plo-bet-calculator?pot=${pot}&call=${call}&dead=${dead}`,
     };
   }
-  if (name === 'calculate_icm_equity') {
+  if (name === 'calculate_icm_equity' || name === 'calculate_icm_payouts') {
     const stacks = (Array.isArray(args.stacks) ? args.stacks : [50000, 30000, 20000]).map(Number);
     const payouts = (Array.isArray(args.payouts) ? args.payouts : [5000, 3000, 2000]).map(Number);
     const n = stacks.length;
@@ -172,6 +125,14 @@ async function forwardRpc(message) {
     return { jsonrpc: '2.0', id, result: {} };
   }
 
+  if (method === 'tools/list') {
+    return {
+      jsonrpc: '2.0',
+      id,
+      result: { tools: TOOLS_SCHEMA },
+    };
+  }
+
   try {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 8000);
@@ -190,14 +151,6 @@ async function forwardRpc(message) {
     }
   } catch {
     // Fall back to local deterministic solvers if offline
-  }
-
-  if (method === 'tools/list') {
-    return {
-      jsonrpc: '2.0',
-      id,
-      result: { tools: FALLBACK_TOOLS },
-    };
   }
 
   if (method === 'tools/call') {
