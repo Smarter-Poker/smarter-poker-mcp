@@ -1,0 +1,38 @@
+{
+  "name": "@smarter-poker/mcp-server",
+  "version": "1.0.0",
+  "description": "Model Context Protocol (MCP) server for Smarter.Poker: 26 poker math, GTO preflop range, Malmuth-Harville ICM, PLO pot-limit bet, live poker room directory, and Robert's Rules / TDA ruling tools.",
+  "type": "module",
+  "homepage": "https://smarter.poker/api/mcp",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Smarter-Poker/smarter-poker-mcp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Smarter-Poker/smarter-poker-mcp/issues"
+  },
+  "license": "MIT",
+  "author": "Smarter Software Inc. (https://smarter.poker)",
+  "bin": {
+    "smarter-poker-mcp": "./bin/smarter-poker-mcp.mjs"
+  },
+  "main": "./bin/smarter-poker-mcp.mjs",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "start": "node ./bin/smarter-poker-mcp.mjs",
+    "test": "node ./test-stdio.mjs"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "poker",
+    "gto",
+    "icm",
+    "pot-odds",
+    "plo",
+    "game-theory",
+    "smarter-poker"
+  ]
+}
