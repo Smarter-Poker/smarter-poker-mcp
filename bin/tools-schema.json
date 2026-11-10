@@ -663,5 +663,105 @@
         }
       }
     }
+  },
+  {
+    "name": "calculate_tournament_chop",
+    "description": "Compute final-table deal payouts comparing Malmuth-Harville ICM Chop, proportional Chip Chop, and Save-Amount Chop (setting aside a trophy cash bonus for 1st place).",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "stacks": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "description": "Array of remaining player chip stacks (e.g. [500000, 300000, 200000])."
+        },
+        "payouts": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "description": "Array of remaining tournament prize payouts from 1st place down (e.g. [10000, 6000, 4000])."
+        },
+        "saveAmount": {
+          "type": "number",
+          "description": "Optional dollar amount set aside for the eventual winner in a Save-Amount deal (default: 0).",
+          "default": 0
+        }
+      },
+      "required": [
+        "stacks",
+        "payouts"
+      ]
+    }
+  },
+  {
+    "name": "simulate_poker_variance",
+    "description": "Calculate expected profit (EV), standard deviation in BB and buy-ins, 68%/95%/99.7% normal confidence intervals, probability of loss over a sample, and minimum hands required for 95% statistical confidence.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "winrateBb100": {
+          "type": "number",
+          "description": "True winrate in Big Blinds per 100 hands (default: 5).",
+          "default": 5
+        },
+        "stdDevBb100": {
+          "type": "number",
+          "description": "Standard deviation in Big Blinds per 100 hands (e.g. 70 live NLH, 85 6-max online NLH, 135 PLO4, default: 85).",
+          "default": 85
+        },
+        "handsPlayed": {
+          "type": "number",
+          "description": "Total sample size in hands played (default: 50000).",
+          "default": 50000
+        }
+      }
+    }
+  },
+  {
+    "name": "calculate_draw_outs",
+    "description": "Compute exact hypergeometric poker draw probabilities (Turn %, River %, Flop-to-River %), Rule of 4 and 2 approximation error, and required break-even pot odds for 1 to 21 clean outs.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "outs": {
+          "type": "integer",
+          "description": "Number of clean unseen outs from 1 to 21 (default: 9).",
+          "default": 9
+        },
+        "street": {
+          "type": "string",
+          "enum": [
+            "flop",
+            "turn"
+          ],
+          "description": "Current street: \"flop\" (2 cards to come, 47 unseen) or \"turn\" (1 card to come, 46 unseen, default: \"flop\").",
+          "default": "flop"
+        }
+      }
+    }
+  },
+  {
+    "name": "lookup_hand_matchup",
+    "description": "Look up exact preflop win/tie/loss equity, combinatorics, flop texture equity shifts, and 100BB vs 25BB stack-off EV notes for canonical Texas Hold'em hand-vs-hand matchups (e.g. \"aa-vs-kk\", \"ak-vs-qq\", \"jj-vs-aks\", \"77-vs-ak\").",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "slug": {
+          "type": "string",
+          "description": "Matchup slug (e.g. \"aa-vs-kk\", \"ak-vs-qq\", \"jj-vs-aks\") or omit to list all 25 canonical matchups."
+        },
+        "handA": {
+          "type": "string",
+          "description": "Optional first hand code (e.g. \"AA\", \"AKs\", \"QQ\")."
+        },
+        "handB": {
+          "type": "string",
+          "description": "Optional second hand code (e.g. \"KK\", \"QQ\", \"AKo\")."
+        }
+      }
+    }
   }
 ]
