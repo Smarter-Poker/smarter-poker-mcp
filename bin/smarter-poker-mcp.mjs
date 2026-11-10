@@ -5,7 +5,7 @@
  * Connects local MCP clients (Claude Desktop, Cursor, Windsurf, VS Code, Zed)
  * and Docker introspection runners (Glama, Smithery) over standard input/output
  * (JSON-RPC 2.0) to the Smarter.Poker MCP engine (https://smarter.poker/api/mcp)
- * with embedded 26-tool schemas (`bin/tools-schema.json`) and deterministic
+ * with embedded 30-tool schemas (`bin/tools-schema.json`) and deterministic
  * local fallback solvers for core poker mathematics.
  */
 
@@ -15,7 +15,7 @@ import readline from 'node:readline';
 const REMOTE_ENDPOINT = process.env.SMARTER_POKER_MCP_URL || 'https://smarter.poker/api/mcp';
 const SERVER_INFO = {
   name: 'smarter-poker-mcp-server',
-  version: '1.0.1',
+  version: '1.8.0',
 };
 
 const TOOLS_SCHEMA = JSON.parse(
@@ -94,6 +94,37 @@ function computeLocalFallback(name, args = {}) {
       canonicalUrl: `https://smarter.poker/tools/icm-calculator?stacks=${stacks.join(',')}&payouts=${payouts.join(',')}`,
     };
   }
+  if (name === 'calculate_draw_outs') {
+    const outs = Math.max(1, Math.min(21, Number(args.outs) || 9));
+    const street = args.street === 'turn' ? 'turn' : 'flop';
+    const turnPct = Number(((outs / 47) * 100).toFixed(2));
+    const riverPct = Number(((outs / 46) * 100).toFixed(2));
+    const flopToRiverPct = Number(((1 - ((47 - outs) / 47) * ((46 - outs) / 46)) * 100).toFixed(2));
+    const ruleOf42Pct = street === 'turn' ? outs * 2 : outs * 4;
+    const exactPct = street === 'turn' ? riverPct : flopToRiverPct;
+    return { outs, street, turnPct, riverPct, flopToRiverPct, ruleOf42Pct, ruleErrorPct: Number((ruleOf42Pct - exactPct).toFixed(2)), canonicalUrl: 'https://smarter.poker/tools/outs-calculator?outs=' + outs + '&street=' + street };
+  }
+  if (name === 'simulate_poker_variance') {
+    const wr = Number(args.winrate_bb_per_100 ?? 5);
+    const sd = Number(args.std_dev_bb_per_100 ?? 85);
+    const hands = Number(args.hands ?? 50000);
+    const n100 = hands / 100;
+    const evBb = Number((wr * n100).toFixed(2));
+    const sdBb = Number((sd * Math.sqrt(n100)).toFixed(2));
+    const minHands95 = wr > 0 ? Math.ceil(Math.pow((1.96 * sd) / wr, 2) * 100) : null;
+    return { winrateBbPer100: wr, stdDevBbPer100: sd, hands, expectedProfitBb: evBb, sampleStdDevBb: sdBb, ci95Bb: [Number((evBb - 1.96 * sdBb).toFixed(2)), Number((evBb + 1.96 * sdBb).toFixed(2))], minHandsFor95Confidence: minHands95, canonicalUrl: 'https://smarter.poker/tools/variance-calculator' };
+  }
+  if (name === 'calculate_tournament_chop') {
+    const stacks = (Array.isArray(args.stacks) ? args.stacks : [50000, 30000, 20000]).map(Number);
+    const payouts = (Array.isArray(args.payouts) ? args.payouts : [5000, 3000, 2000]).map(Number);
+    const totalChips = stacks.reduce((a, b) => a + b, 0);
+    const totalPrize = payouts.reduce((a, b) => a + b, 0);
+    return { stacks, payouts, chipChop: stacks.map((s, i) => ({ player: i + 1, chipChopDollars: Number(((s / totalChips) * totalPrize).toFixed(2)) })), canonicalUrl: 'https://smarter.poker/tools/chop-calculator' };
+  }
+  if (name === 'lookup_hand_matchup') {
+    const slug = (args.slug || 'aa-vs-kk').toLowerCase();
+    return { slug, canonicalUrl: 'https://smarter.poker/learn/matchups/' + slug };
+  }
   return {
     tool: name,
     canonicalUrl: 'https://smarter.poker/tools',
@@ -113,6 +144,7 @@ async function forwardRpc(message) {
           tools: { listChanged: false },
         },
         serverInfo: SERVER_INFO,
+        instructions: "Smarter.Poker MCP Server (30 read-only, deterministic poker mathematics, GTO strategy, cardroom directory, and TDA rules tools). Tool-Selection & Disambiguation Guide: (1) Hand Equity & Draws: Use `lookup_hand_matchup` for canonical 2-hand preflop Hold'em confrontations (e.g. AA vs KK); use `calculate_poker_odds` for custom 2-to-6 player Hold'em/Omaha/Short-Deck hands or postflop boards; use `calculate_draw_outs` when you know the number of clean outs (1-21) and want Turn/River hit % and Rule-of-4/2 error; use `calculate_pot_odds_and_mdf` when facing a specific bet into a known pot. (2) Preflop Ranges: Use `get_preflop_chart` for an entire 6-max positional opening chart (UTG..BB); use `lookup_starting_hand` for a single hand (e.g. AKs) across all positions. (3) Tournament Math: Use `calculate_icm_payouts` for bubble/final-table $EV; use `calculate_tournament_chop` when comparing ICM Chop vs Chip Chop vs Save deals; use `calculate_bounty_chip_equity` for PKO/Mystery Bounty chip conversion. (4) Bankroll & Variance: Use `calculate_bankroll_risk_of_ruin` for infinite-horizon Risk of Ruin and buy-in buffers; use `simulate_poker_variance` for confidence intervals and loss probability over a finite hand sample. (5) Live Poker & Rules: Use `search_poker_venues` / `get_venue_details` for rooms, `search_tournament_series` / `get_series_details` for festivals, `get_regional_market_guide` for metro comparisons, and `lookup_poker_rule` for TDA/RROP floor rulings.",
       },
     };
   }
