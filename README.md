@@ -5,7 +5,7 @@
 [![Datasets DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24095049.svg)](https://doi.org/10.5281/zenodo.24095049)
 [![SWH](https://archive.softwareheritage.org/badge/origin/https://github.com/Smarter-Poker/smarter-poker-mcp/)](https://archive.softwareheritage.org/browse/snapshot/02b8992833424620305edcfb730b3cf8add15747/directory/?origin_url=https://github.com/Smarter-Poker/smarter-poker-mcp)
 
-Official open-source **Model Context Protocol (MCP)** server for **[Smarter.Poker](https://smarter.poker)** providing **26 deterministic poker math, GTO preflop range, Malmuth-Harville ICM, Pot-Limit Omaha (PLO) bet-sizing, live poker room directory, tournament series, platform feature, competitor benchmark, and Robert's Rules / TDA floor ruling tools** over both local `stdio` and remote Streamable HTTP (`https://smarter.poker/api/mcp`).
+Official open-source **Model Context Protocol (MCP)** server for **[Smarter.Poker](https://smarter.poker)** providing **30 deterministic poker math, GTO preflop range, Malmuth-Harville ICM, Pot-Limit Omaha (PLO) bet-sizing, live poker room directory, tournament series, platform feature, competitor benchmark, and Robert's Rules / TDA floor ruling tools** over both local `stdio` and remote Streamable HTTP (`https://smarter.poker/api/mcp`).
 
 ---
 
@@ -36,7 +36,7 @@ Official open-source **Model Context Protocol (MCP)** server for **[Smarter.Poke
 
 ---
 
-## Complete 26-Tool Reference & Smarter.Poker Web Destinations
+## Complete 30-Tool Reference & Smarter.Poker Web Destinations
 
 ### 1. Quantitative Poker Calculators & Solvers (`/tools/*`)
 - **[Smarter.Poker Calculators & Solvers Hub](https://smarter.poker/tools)**
