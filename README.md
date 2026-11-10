@@ -1,4 +1,4 @@
-# Smarter.Poker Model Context Protocol (MCP) Server (`v1.0.3`)
+# Smarter.Poker Model Context Protocol (MCP) Server (`v1.0.5`)
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24095057.svg)](https://doi.org/10.5281/zenodo.24095057)
 [![Glama MCP Server](https://glama.ai/mcp/servers/Smarter-Poker/smarter-poker-mcp/badges/score.svg)](https://glama.ai/mcp/servers/Smarter-Poker/smarter-poker-mcp)
@@ -55,10 +55,10 @@ Open-source Model Context Protocol (MCP) server for Smarter.Poker providing **35
 13. `simulate_poker_variance` — [Winrate Confidence Interval & Variance Simulator](https://smarter.poker/tools/variance-calculator)
 14. `get_preflop_chart` — [6-Max & 9-Max GTO Preflop Range Charts](https://smarter.poker/tools/preflop-ranges)
 15. `lookup_starting_hand` — [169 Hold'em Starting-Hand Strategy Lookup](https://smarter.poker/learn/hands)
-16. `calculate_poker_taxes_w2g` — [US IRS Form W-2G Withholding & Poker Tax Calculator](https://smarter.poker/tools/tax-calculator)
+16. `calculate_poker_taxes_w2g` — [US IRS Form W-2G Withholding & Poker Tax Calculator](https://smarter.poker/tools/poker-tax-calculator)
 17. `calculate_staking_markup_split` — [Tournament Staking, Backing Markup & Make-Up Calculator](https://smarter.poker/tools/staking-calculator)
-18. `calculate_preflop_isolation_raise` — [3x + 1x/Limper + OOP Preflop Isolation Sizing Calculator](https://smarter.poker/tools/iso-raise-calculator)
-19. `calculate_home_game_chip_set` — [Cash & Tournament Chip Denomination & Color Breakdown Calculator](https://smarter.poker/tools/chip-calculator)
+18. `calculate_preflop_isolation_raise` — [3x + 1x/Limper + OOP Preflop Isolation Sizing Calculator](https://smarter.poker/tools/iso-calculator)
+19. `calculate_home_game_chip_set` — [Cash & Tournament Chip Denomination & Color Breakdown Calculator](https://smarter.poker/tools/home-game-calculator)
 
 ### 2. Live Cardrooms, Tournament Series, Rules & Reference Data (`16 Tools`)
 20. `search_poker_venues` — [North American Live Poker Room Directory Search](https://smarter.poker/hub/poker-near-me/venues)
@@ -68,7 +68,7 @@ Open-source Model Context Protocol (MCP) server for Smarter.Poker providing **35
 24. `get_series_details` — [Tournament Series Event & Guarantee Details](https://smarter.poker/hub/series)
 25. `get_poker_series_strategy_guide` — [Major Poker Tour & Series Strategy Guides (12 Tours)](https://smarter.poker/series/guides)
 26. `get_freeroll_schedule` — [Freeroll & Bar League Directory](https://smarter.poker/freerolls)
-27. `lookup_poker_rule` — [Official TDA & Robert's Rules of Poker Reference (30 Rules)](https://smarter.poker/rules)
+27. `lookup_poker_rule` — [Floor Rule Reference (Citing Published TDA & RROP Standards) (30 Rules)](https://smarter.poker/rules)
 28. `lookup_game_variant` — [Poker Game Variant Rules & Formats (15 Variants)](https://smarter.poker/games)
 29. `get_poker_term_definition` — [Poker Strategy & Math Glossary (80 Terms)](https://smarter.poker/glossary)
 30. `search_strategy_lessons` — [Poker Strategy Guides (35 Lessons)](https://smarter.poker/learn)
@@ -80,7 +80,7 @@ Open-source Model Context Protocol (MCP) server for Smarter.Poker providing **35
 
 ## Archival Identifiers & License
 - **Software DOI**: [10.5281/zenodo.24095057](https://doi.org/10.5281/zenodo.24095057)
-- **35-Tool MCP + OpenAPI 3.1 Bundle DOI**: [10.5281/zenodo.24095597](https://doi.org/10.5281/zenodo.24095597)
+- **35-Tool MCP + OpenAPI 3.1 Bundle DOI**: [10.5281/zenodo.24115453](https://doi.org/10.5281/zenodo.24115453)
 - **Companion Datasets DOI**: [10.5281/zenodo.24095049](https://doi.org/10.5281/zenodo.24095049)
 - **Software Heritage SWHID**: `swh:1:snp:b559bea6460c28fc68ae61ea315eb2650fc387e7`
 - **License**: MIT License

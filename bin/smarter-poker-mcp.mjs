@@ -15,7 +15,7 @@ import readline from 'node:readline';
 const REMOTE_ENDPOINT = process.env.SMARTER_POKER_MCP_URL || 'https://smarter.poker/api/mcp';
 const SERVER_INFO = {
   name: 'smarter-poker-mcp-server',
-  version: '1.0.3',
+  version: '1.0.5',
 };
 
 const TOOLS_SCHEMA = JSON.parse(
@@ -41,7 +41,7 @@ function computeLocalFallback(name, args = {}) {
       canonicalUrl: `https://smarter.poker/tools/pot-odds-calculator?pot=${pot}&bet=${bet}&outs=${outs}`,
     };
   }
-  if (name === 'calculate_plo_pot_limit_bet') {
+  if (name === 'calculate_plo_max_bet_and_rake' || name === 'calculate_plo_pot_limit_bet') {
     const pot = Number(args.pot) || 100;
     const call = Number(args.call) || 50;
     const dead = Number(args.dead) || 0;
