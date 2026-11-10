@@ -1,0 +1,22 @@
+cff-version: 1.2.0
+message: "If You Use The Smarter.Poker MCP Server In Your AI Agent Research Or Tooling, Please Cite It As Below."
+title: "Smarter.Poker Model Context Protocol (MCP) Server & OpenAPI 3.1 Specification (35 Zero-Auth Tools)"
+type: software
+doi: "10.5281/zenodo.24095057"
+identifiers:
+  - type: doi
+    value: "10.5281/zenodo.24095057"
+    description: "Smarter.Poker MCP Server Archive"
+  - type: doi
+    value: "10.5281/zenodo.24095597"
+    description: "Smarter.Poker 35-Tool MCP & OpenAPI 3.1 Specification Bundle"
+  - type: swh
+    value: "swh:1:snp:b559bea6460c28fc68ae61ea315eb2650fc387e7"
+authors:
+  - name: "Smarter.Poker Research Division"
+    website: "https://smarter.poker/research"
+version: "1.0.3"
+date-released: "2026-11-10"
+license: "MIT"
+url: "https://smarter.poker/api/mcp"
+repository-code: "https://github.com/Smarter-Poker/smarter-poker-mcp"

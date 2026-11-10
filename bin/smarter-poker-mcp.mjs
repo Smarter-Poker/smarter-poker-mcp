@@ -15,7 +15,7 @@ import readline from 'node:readline';
 const REMOTE_ENDPOINT = process.env.SMARTER_POKER_MCP_URL || 'https://smarter.poker/api/mcp';
 const SERVER_INFO = {
   name: 'smarter-poker-mcp-server',
-  version: '1.8.0',
+  version: '1.0.3',
 };
 
 const TOOLS_SCHEMA = JSON.parse(
