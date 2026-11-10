@@ -1,7 +1,14 @@
 [
   {
     "name": "search_poker_venues",
-    "description": "Search the verified Smarter.Poker North American cardroom directory by venue name, city, two-letter state code, or venue category (casino, card_room, charity, poker_club). Read-only, side-effect-free directory query requiring no authentication; combines all supplied filters with logical AND and returns a bounded JSON array (up to `limit`, default 20, max 50) of venue summaries containing `id`, `name`, `city`, `state`, `type`, `tables`, and `canonicalUrl`, or an empty array if no venues match. Use this tool when discovering poker rooms in a city/state or resolving a partial venue name to a `venue_id`. Do NOT pass game variants (like NLH or PLO) into `type`; for full address, phone, cash games offered, and daily tournament schedules of a single known venue ID, call `get_venue_details` instead, or call `get_regional_market_guide` for metro-wide rake and buy-in comparisons.",
+    "description": "Search verified poker rooms and casinos by name, city, state, or venue type across North America.",
+    "annotations": {
+      "title": "Search Live Poker Venues",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -25,7 +32,7 @@
             "charity",
             "poker_club"
           ],
-          "description": "Venue category filter (`casino`, `card_room`, `charity`, or `poker_club`). Do not pass game variants like NLH or PLO."
+          "description": "Type of poker venue."
         },
         "limit": {
           "type": "integer",
@@ -33,18 +40,18 @@
           "default": 10
         }
       }
-    },
-    "annotations": {
-      "title": "Search North American Poker Venues",
-      "readOnlyHint": true,
-      "destructiveHint": false,
-      "idempotentHint": true,
-      "openWorldHint": true
     }
   },
   {
     "name": "get_venue_details",
-    "description": "Retrieve the complete profile for a single poker venue by its numeric `venue_id` or URL slug, including street address, phone number, table count, active cash game variants, rake/time-charge structure, and recurring tournament schedule. Read-only, side-effect-free lookup requiring no authentication; returns a single deterministic JSON venue object (~1-3 KB) with canonical URL (`https://smarter.poker/hub/venues/{id}`), or a 404 error object if the identifier is unknown. Use this tool when you already have a specific `venue_id` or slug (for example from `search_poker_venues`) and need full operational details for that room. Do NOT use this tool to search by city or state; call `search_poker_venues` first to find matching venue IDs, or `search_tournament_series` for multi-event festival schedules.",
+    "description": "Retrieve detailed information, address, phone, games offered, table counts, and tournament schedules for a specific poker venue ID.",
+    "annotations": {
+      "title": "Get Poker Venue Details By ID",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -56,18 +63,18 @@
       "required": [
         "id"
       ]
-    },
-    "annotations": {
-      "title": "Get Single Poker Venue Details",
-      "readOnlyHint": true,
-      "destructiveHint": false,
-      "idempotentHint": true,
-      "openWorldHint": true
     }
   },
   {
     "name": "search_tournament_series",
-    "description": "Search live poker tournament series, championship festivals, and major tours (WSOP, WPT, WSOPC, MSPT, RGPS, PGT, NAPT) by keyword, tour code, two-letter state, or year. Read-only, side-effect-free query requiring no authentication; filters combine with logical AND, ordered chronologically by start date, returning up to `limit` (default 20, max 50) JSON series summaries (`series_id`, `name`, `tour_code`, `venue`, `start_date`, `end_date`, `canonicalUrl`). Use this tool to find upcoming or historical tournament festivals by tour, location, or date range. Do NOT use this tool for full event-by-event schedules of a single known series (call `get_series_details` with the `series_id`), nor for daily recurring cardroom tournaments (call `get_venue_details`) or online freerolls (call `get_freeroll_schedule`).",
+    "description": "Search poker tournament series, championship festivals, and tours (WSOP, WPT, MSPT, RGPS, PGT, DeepStack).",
+    "annotations": {
+      "title": "Search Poker Tournament Series",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -93,18 +100,18 @@
           "default": 10
         }
       }
-    },
-    "annotations": {
-      "title": "Search Poker Tournament Series & Tours",
-      "readOnlyHint": true,
-      "destructiveHint": false,
-      "idempotentHint": true,
-      "openWorldHint": true
     }
   },
   {
     "name": "get_series_details",
-    "description": "Retrieve the complete festival metadata and event-by-event schedule (buy-ins, guaranteed prize pools, starting stacks, blind level durations, and host venue info) for a single tournament series identified by `series_id`. Read-only, side-effect-free lookup requiring no authentication; returns one JSON object (~2-8 KB) containing series metadata, an array of numbered events, and the canonical URL (`https://smarter.poker/hub/series/{series_id}`). Use this tool after identifying a target `series_id` via `search_tournament_series` when the user asks for specific event buy-ins, dates, or guarantees within that stop. Do NOT use this tool to browse across multiple tours or states (use `search_tournament_series` instead).",
+    "description": "Retrieve full details for a tournament series, including event schedules, buy-ins, guarantees, and host venue information.",
+    "annotations": {
+      "title": "Get Tournament Series Details By ID",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -116,18 +123,18 @@
       "required": [
         "id"
       ]
-    },
-    "annotations": {
-      "title": "Get Tournament Series Schedule & Details",
-      "readOnlyHint": true,
-      "destructiveHint": false,
-      "idempotentHint": true,
-      "openWorldHint": true
     }
   },
   {
     "name": "calculate_poker_odds",
-    "description": "Compute Monte Carlo or exhaustive multi-way win, tie, and total equity percentages for 2 to 6 explicit player hands across Texas Hold'em (`nlh`), 4/5/6-Card Pot-Limit Omaha (`plo4`, `plo5`, `plo6`), and Short Deck (`short_deck`), optionally conditioned on 3 to 5 community board cards. Pure read-only, side-effect-free computation requiring no authentication; `iterations` (1,000 to 50,000, default 10,000) trades execution time (<150ms) for sampling precision (±0.3% at 50,000 iterations), returning a JSON object with per-hand `winPct`, `tiePct`, `equityPct`, and a shareable permalink. Use this tool when exact hole cards for 2+ players are known (preflop or postflop) and you need multi-way or Omaha/Hold'em runout equities. Do NOT use this tool for canonical 2-hand preflop Hold'em archetype tables with flop-texture notes (call `lookup_hand_matchup`), single-player draw out counting (call `calculate_draw_outs`), or bet-facing pot-odds/MDF math (call `calculate_pot_odds_and_mdf`).",
+    "description": "Calculate exact equity, win, and tie probabilities for Texas Hold'em and Omaha hands with board runouts.",
+    "annotations": {
+      "title": "Calculate Multiway Poker Hand Equity & Odds",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -182,18 +189,18 @@
       "required": [
         "hands"
       ]
-    },
-    "annotations": {
-      "title": "Calculate Multi-Way Hold'em & Omaha Hand Equity",
-      "readOnlyHint": true,
-      "destructiveHint": false,
-      "idempotentHint": true,
-      "openWorldHint": false
     }
   },
   {
     "name": "get_preflop_chart",
-    "description": "Retrieve the complete 100BB 6-Max Cash Game GTO Raise-First-In (RFI) opening range chart for a specific table position (`UTG`, `MP`, `CO`, `BTN`, `SB`, `BB`), including total opening percentage, combo count, pure-raise hands, and mixed-frequency hands. Pure read-only, static reference lookup with no side effects or authentication; returns a compact JSON object (~2 KB) with positional range arrays, summary frequencies, and canonical chart URL (`https://smarter.poker/tools/preflop-ranges/{position}`). Use this tool when a user asks for the full opening chart or all playable hands from a specific 6-max table seat. Do NOT use this tool to inspect a single specific starting hand like 'AKs' or '88' across all positions (call `lookup_starting_hand` instead), nor for short-stack (<20BB) all-in push/fold charts.",
+    "description": "Retrieve GTO opening ranges and frequencies for 6-max cash games at 100BB stack depth.",
+    "annotations": {
+      "title": "Get 100BB 6-Max GTO Preflop Chart",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -211,18 +218,18 @@
           "default": "UTG"
         }
       }
-    },
-    "annotations": {
-      "title": "Get 100BB 6-Max GTO Preflop Opening Range Chart",
-      "readOnlyHint": true,
-      "destructiveHint": false,
-      "idempotentHint": true,
-      "openWorldHint": false
     }
   },
   {
     "name": "calculate_icm_payouts",
-    "description": "Compute exact Malmuth-Harville Independent Chip Model (ICM) tournament dollar equity (`$EV`), chip-share percentage, and bubble risk-premium notes for 2 to 9 final-table players from their `stacks` array and the tournament `payouts` array. Pure read-only, deterministic recursive calculation with zero side effects; `stacks` must contain positive numbers in chip units and `payouts` lists prize amounts in descending order (1st place first), returning a JSON array of per-player `{ player, stack, chipPct, icmDollarEv }` rounded to 2 decimal places. Use this tool to evaluate true tournament dollar EV of each stack on a bubble or final table. Do NOT use this tool when comparing ICM Chop vs. Chip Chop vs. Save-Amount deal splits (call `calculate_tournament_chop` instead), nor for PKO/Mystery Bounty chip conversions (call `calculate_bounty_chip_equity`).",
+    "description": "Calculate Independent Chip Model (ICM) tournament equity in dollars based on stack sizes and prize payouts.",
+    "annotations": {
+      "title": "Calculate Tournament ICM Payout Equity",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -245,18 +252,18 @@
         "stacks",
         "payouts"
       ]
-    },
-    "annotations": {
-      "title": "Calculate Malmuth-Harville Tournament ICM Equity",
-      "readOnlyHint": true,
-      "destructiveHint": false,
-      "idempotentHint": true,
-      "openWorldHint": false
     }
   },
   {
     "name": "get_poker_term_definition",
-    "description": "Retrieve the authoritative definition, mathematical formula, strategic context, and related terms for a poker concept or acronym (e.g., `GTO`, `ICM`, `MDF`, `SPR`, `C-Bet`, `Polarized Range`, `Ghost Equity`) from the 80-term Smarter.Poker glossary. Pure read-only reference lookup with zero side effects; performs case-insensitive slug or keyword matching and returns a JSON object (~1 KB) containing `term`, `category`, `definition`, `examples`, and canonical URL (`https://smarter.poker/glossary/{slug}`). Use this tool when the user asks 'what does X mean in poker?' or needs a concise conceptual definition. Do NOT use this tool for formal floor dispute rulings (call `lookup_poker_rule`), complete multi-section strategy lessons (call `search_strategy_lessons`), or live mathematical calculations.",
+    "description": "Look up authoritative definitions, GTO concepts, and rules from the official Smarter.Poker glossary.",
+    "annotations": {
+      "title": "Look Up Poker Glossary Term Definition",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -268,18 +275,18 @@
       "required": [
         "term"
       ]
-    },
-    "annotations": {
-      "title": "Look Up Official Poker Glossary Term",
-      "readOnlyHint": true,
-      "destructiveHint": false,
-      "idempotentHint": true,
-      "openWorldHint": false
     }
   },
   {
     "name": "get_freeroll_schedule",
-    "description": "Retrieve the upcoming schedule, entry requirements, prize pool structures, and game formats for Daily $2,000 Freerolls and Diamond Arena Freerolls on Smarter.Poker, optionally filtered by `game_type` (`all`, `NLH`, `PLO`). Read-only, side-effect-free schedule lookup requiring no authentication; returns a JSON object containing up to `limit` (default 10, max 30) upcoming freeroll events and the canonical registration URL (`https://smarter.poker/freerolls`). Use this tool when a user asks about free-to-enter online tournaments or Diamond Arena freerolls on Smarter.Poker. Do NOT use this tool for live brick-and-mortar casino tournament series (call `search_tournament_series` or `get_series_details`).",
+    "description": "Retrieve the upcoming Daily $2,000 Freerolls and Diamond Arena Freerolls schedule, formats, prize values, and entry requirements on Smarter.Poker.",
+    "annotations": {
+      "title": "Get Daily Freeroll Tournament Schedule",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -294,18 +301,18 @@
           "default": "all"
         }
       }
-    },
-    "annotations": {
-      "title": "Get Smarter.Poker Daily Freeroll Schedule",
-      "readOnlyHint": true,
-      "destructiveHint": false,
-      "idempotentHint": true,
-      "openWorldHint": true
     }
   },
   {
     "name": "get_platform_feature_specs",
-    "description": "Retrieve technical specifications, capabilities, pricing ($0 free tier vs. paid industry alternatives), and canonical URLs for one or all 15 Smarter.Poker product verticals (`bankroll`, `toke_tracker`, `ai_coach`, `sandbox`, `club_commander`, `messenger`, `trivia`, `training`, `home_games`, `video_library`, `poker_near_me`, `club_arena`, `reels`, `preflop_charts`, `calculators`). Pure read-only static documentation lookup with no side effects; passing a single vertical slug returns a ~1 KB spec object, whereas `vertical='all'` (default) returns all 15 specs (~12 KB JSON). Use this tool when explaining what Smarter.Poker or Club Commander offers in a product vertical. Do NOT use this tool for head-to-head competitor comparison matrices against named third-party brands like PokerBros, PioSolver, or Bravo (call `get_competitor_comparison` instead).",
+    "description": "Retrieve comprehensive specifications, free alternatives comparisons, URLs, and Markdown specs for all 15 Smarter.Poker platform verticals (Bankroll W-2G Tax Ledger, Dealer Toke Tracker, Jarvis AI Coach, Virtual Sandbox, Club Commander, FaceTime Messenger, Trivia, GTO Training, Home Games, Video Library, Poker Near Me, Club Arena, Social Reels, Preflop Charts, and Equity Calculators).",
+    "annotations": {
+      "title": "Get Smarter.Poker Platform Vertical Specs",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -333,18 +340,18 @@
           "default": "all"
         }
       }
-    },
-    "annotations": {
-      "title": "Get Smarter.Poker Platform Feature Specifications",
-      "readOnlyHint": true,
-      "destructiveHint": false,
-      "idempotentHint": true,
-      "openWorldHint": false
     }
   },
   {
     "name": "search_strategy_lessons",
-    "description": "Search or retrieve full GTO poker strategy articles, answer-first executive summaries, mathematical reference tables, and recommended drills from the 40-lesson Smarter.Poker Academy (`/learn`). Pure read-only reference query with no side effects; passing an exact `slug` returns the complete lesson (~4 KB JSON), while passing `category` (`preflop`, `postflop`, `tournaments`, `cash`, `math`, `plo`, `theory`, `mental-game`, `bankroll`) or `query` returns matching lesson summaries. Use this tool when a user asks for in-depth strategic guidance, theory explanations, or study articles. Do NOT use this tool for single starting-hand lookups like 'AKs' (call `lookup_starting_hand`), head-to-head preflop matchups like 'AA vs KK' (call `lookup_hand_matchup`), or short glossary definitions (call `get_poker_term_definition`).",
+    "description": "Search and retrieve complete GTO poker strategy lessons, answer-first summaries, mathematical tables, and training tool recommendations from the 40-lesson Smarter.Poker curriculum.",
+    "annotations": {
+      "title": "Search GTO Poker Strategy Lessons",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -367,38 +374,38 @@
           "description": "Optional strategy category filter."
         }
       }
-    },
-    "annotations": {
-      "title": "Search 40-Lesson GTO Poker Strategy Curriculum",
-      "readOnlyHint": true,
-      "destructiveHint": false,
-      "idempotentHint": true,
-      "openWorldHint": false
     }
   },
   {
     "name": "get_competitor_comparison",
-    "description": "Retrieve verified side-by-side feature, pricing, rake, and architecture comparison matrices across all 30 Smarter.Poker `/compare/*` benchmarks (covering solver/training tools like PioSolver, MonkerSolver, ICMIZER, Equilab, Flopzilla, PokerTracker 4, Holdem Manager 3, Upswing, Run It Once, PokerCoaching; club/room apps like PokerBros, PPPoker, ClubGG, Bravo Poker Live, TableCaptain; and flagship cardrooms like Bellagio vs Aria, Wynn vs Venetian, Borgata vs Parx, Commerce vs Bicycle). Pure read-only static lookup with zero side effects; omit `competitor` to list all 30 comparison slugs (~3 KB), or pass a slug/brand keyword to retrieve the full feature matrix and verdict (~3 KB). Use this tool when comparing Smarter.Poker or Club Commander against another poker app, solver, tracker, or comparing major live cardrooms. Do NOT use this tool for internal Smarter.Poker feature specs alone (call `get_platform_feature_specs`).",
+    "description": "Retrieve verified, source-cited side-by-side comparison matrices and best-of benchmarks across all 30 Smarter.Poker competitor comparisons (PokerBros, PPPoker, ClubGG, Pokerrrr 2, Bravo Poker Live, PokerAtlas, TableCaptain, GTO Wizard, DTO Poker, Sharp Poker, Pokerbase, Poker Bankroll Tracker, DownCount, Bellagio, Aria, Wynn, Venetian, Commerce, The Lodge, Texas Card House, Borgata, Seminole Hard Rock, Run It Once, Upswing Poker, PokerCoaching, Red Chip Poker, PokerTracker 4, Holdem Manager 3, PioSolver, MonkerSolver, ICMIZER, Equilab).",
+    "annotations": {
+      "title": "Get Verified Competitor Comparison Matrix",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
     "inputSchema": {
       "type": "object",
       "properties": {
         "slug": {
           "type": "string",
-          "description": "Comparison slug (e.g. \"best-poker-club-apps\", \"best-gto-poker-trainers\", \"smarter-poker-vs-piosolver\", \"smarter-poker-vs-run-it-once\") or omit to list all 25 verified comparisons."
+          "description": "Comparison slug (e.g. \"best-poker-club-apps\", \"best-gto-poker-trainers\", \"smarter-poker-vs-piosolver\", \"smarter-poker-vs-run-it-once\", \"wynn-vs-venetian-las-vegas-poker\") or omit to list all 30 verified comparisons."
         }
       }
-    },
-    "annotations": {
-      "title": "Get Competitor Software & Cardroom Comparison Matrix",
-      "readOnlyHint": true,
-      "destructiveHint": false,
-      "idempotentHint": true,
-      "openWorldHint": false
     }
   },
   {
     "name": "lookup_starting_hand",
-    "description": "Retrieve exact combinatorics (4, 6, or 12 combos), raw equity vs. random hand, 100BB 6-Max GTO Raise-First-In (RFI) action by position (`UTG` through `SB`), 3-bet defense notes, and postflop playability profile for any of the 169 canonical Texas Hold'em starting hands (`hand` in shorthand like `AA`, `AKs`, `AQo`, `87s`, `72o` or slug like `pocket-aces`). Pure read-only deterministic lookup with zero side effects; returns a single JSON object (~1.5 KB) with canonical URL (`https://smarter.poker/learn/hands/{slug}`). Use this tool when the user asks how to play one specific two-card Hold'em starting hand across positions. Do NOT use this tool when the user wants the entire 169-hand range matrix for a single seat (call `get_preflop_chart`), nor when comparing two specific hands head-to-head like 'AKs vs QQ' (call `lookup_hand_matchup`).",
+    "description": "Look up combinatorics, 100BB 6-Max GTO positional opening ranges, 3-bet strategies, and preflop equities for any of the 169 canonical Texas Holdem starting hands (e.g. \"AA\", \"KK\", \"88\", \"AKs\", \"AQo\", \"KJs\", \"87s\", \"65s\", \"J9s\", \"54s\", \"72o\", \"pocket-aces\", \"ace-king-suited\").",
+    "annotations": {
+      "title": "Look Up Canonical Starting Hand (169 Hands)",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -407,18 +414,18 @@
           "description": "Hand code or slug (e.g. \"AA\", \"KK\", \"88\", \"AKs\", \"AQo\", \"KJs\", \"87s\", \"65s\", \"J9s\", \"54s\", \"72o\", \"pocket-aces\"). Omit to list all 169 canonical starting hand guides."
         }
       }
-    },
-    "annotations": {
-      "title": "Look Up Single Texas Hold'em Starting Hand Strategy",
-      "readOnlyHint": true,
-      "destructiveHint": false,
-      "idempotentHint": true,
-      "openWorldHint": false
     }
   },
   {
     "name": "get_research_report",
-    "description": "Retrieve methodology, sample size, statistical findings, data tables, and Zenodo dataset archive DOI (`10.5281/zenodo.24095049`) citations from Smarter.Poker's 15 CC-BY 4.0 empirical poker research studies (covering US live cardroom rake/time-charges, daily tournament buy-ins, GTO vs. population leaks, club software economics, dealer toke rates, ICM bubble factors, PLO4/5/6 variance, IRS W-2G tax accounting, waitlist turnover, union settlements, Mystery Bounty vs. PKO EV, Short Deck math, Double-Board Bomb Pots, low-stakes tendencies, and satellite bubble survival). Pure read-only reference retrieval with zero side effects; omitting `slug` returns a compact directory index (~2 KB) of all 15 study slugs and abstracts, while supplying `slug` returns that study's full findings and dataset table (~4 KB). Use this tool to cite empirical industry statistics, population benchmarks, or academic dataset DOIs. Do NOT use this tool for interactive per-hand calculations (use the `calculate_*` tools) or city-specific cardroom guides (call `get_regional_market_guide`).",
+    "description": "Retrieve first-party empirical poker industry research reports and dataset benchmarks across all 15 Smarter.Poker studies (US Live Poker Room Rake & Jackpot Benchmark, Daily Tournament Buy-In Index, GTO vs Population Leak Study, Private Club Software Economics, Poker Dealer Toke & Hourly Rate Benchmark, Tournament ICM Bubble Factor & Risk Premium Study, PLO4/PLO5/PLO6 Equity & Variance Study, US Poker Tax W-2G & Session Accounting Benchmark, Cardroom Waitlist Turnover & Table Utilization Benchmark, Private Poker Club Markup & Union Settlement Study, Mystery Bounty vs PKO EV Study, Short Deck 6+ Equity Benchmark, Double-Board PLO Bomb Pot Study, Live Low-Stakes Population Tendencies, Satellite Bubble Survival Math Study).",
+    "annotations": {
+      "title": "Get Empirical Poker Research Report",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -427,18 +434,18 @@
           "description": "Research report slug (e.g. \"us-live-poker-room-rake-and-jackpot-benchmark\", \"mystery-bounty-vs-pko-ev-and-bounty-power-factor-study\") or omit to list all 15 empirical studies."
         }
       }
-    },
-    "annotations": {
-      "title": "Get Empirical Poker Research Study & Dataset Benchmark",
-      "readOnlyHint": true,
-      "destructiveHint": false,
-      "idempotentHint": true,
-      "openWorldHint": false
     }
   },
   {
     "name": "search_training_simulators",
-    "description": "Search and filter Smarter.Poker's 24 interactive web calculators (`/tools/*`) and 107 GTO scenario training games (`/hub/training/*`) by skill topic (`query`), game format (`category`: `all`, `calculators`, `preflop`, `postflop`, `icm`, `plo`, `cash`, `tournaments`, `mental`), or exact slug. Pure read-only catalog search with zero side effects; returns a JSON list of matching interactive simulators with titles, skill tags, and direct launch URLs. Use this tool when recommending interactive practice drills, warmups, or web simulators to a player. Do NOT use this tool to execute a math calculation directly (call the specific `calculate_*` tool instead) or to read text strategy lessons (call `search_strategy_lessons`).",
+    "description": "Search and retrieve interactive Smarter.Poker World Hub tools, GTO solvers, ICM calculators, leak scanners, range builders, and all 107 scenario training games by skill topic, format, or slug.",
+    "annotations": {
+      "title": "Search GTO Simulators & 107 Training Games",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -461,18 +468,18 @@
           "default": "ALL"
         }
       }
-    },
-    "annotations": {
-      "title": "Search Interactive GTO Simulators & Training Drills",
-      "readOnlyHint": true,
-      "destructiveHint": false,
-      "idempotentHint": true,
-      "openWorldHint": false
     }
   },
   {
     "name": "calculate_pot_odds_and_mdf",
-    "description": "Compute closed-form pot odds ratio (`X : 1`), required break-even calling equity percentage (`bet / (pot + 2*bet)`), Minimum Defense Frequency (`MDF = pot / (pot + bet)`), optimal polarized river bluff-to-value ratio, and—when `outs > 0`—exact hypergeometric 1-card/2-card draw completion probabilities plus EV of calling. Pure read-only, deterministic calculation with zero side effects; accepts `pot` and `bet` in any consistent unit (chips, dollars, or BBs) and optional `outs` (0 to 20), returning all metrics in a single JSON object (<1 KB). Use this tool when a player faces a specific bet into a known pot and needs required calling equity, MDF defense frequency, or call EV. Do NOT use this tool when no bet is specified and the user only wants Turn/River/Flop-to-River draw completion percentages and Rule-of-4/2 error for N outs (call `calculate_draw_outs`), nor for hand-vs-hand card simulations (call `calculate_poker_odds`).",
+    "description": "Calculate exact poker pot odds ratio, required break-even calling equity, Minimum Defense Frequency (MDF), optimal polarized river bluff ratio, and 1-card/2-card hypergeometric draw completion probabilities.",
+    "annotations": {
+      "title": "Calculate Pot Odds & Minimum Defense Frequency",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -492,18 +499,18 @@
           "default": 9
         }
       }
-    },
-    "annotations": {
-      "title": "Calculate Pot Odds, Break-Even Equity & MDF",
-      "readOnlyHint": true,
-      "destructiveHint": false,
-      "idempotentHint": true,
-      "openWorldHint": false
     }
   },
   {
     "name": "calculate_bankroll_risk_of_ruin",
-    "description": "Compute exact Brownian-motion Risk of Ruin (`RoR % = exp(-2 * winrate * bankroll_bb / std_dev^2)`) and required buy-in buffers for 5% and 1% Risk of Ruin thresholds from true `winrate_bb_per_100`, `std_dev_bb_per_100` (e.g., 70 live NLH, 85 online 6-max, 135 PLO4), and `bankroll_buyins` (100BB buy-ins). Pure read-only, deterministic closed-form calculation with zero side effects; if `winrate_bb_per_100 <= 0`, returns `riskOfRuinPct: 100` with an explanatory warning that non-positive winrates guarantee eventual ruin. Use this tool when sizing a total poker bankroll in buy-ins or computing probability of going broke at a given stake. Do NOT use this tool to simulate confidence intervals, downswing probability, or expected profit over a finite sample of N hands (call `simulate_poker_variance` instead).",
+    "description": "Calculate exact Brownian motion poker Risk of Ruin (RoR) percentage and required buy-in buffers for 5% and 1% Risk of Ruin from true winrate (BB/100), standard deviation (BB/100), and bankroll buy-ins.",
+    "annotations": {
+      "title": "Calculate Poker Bankroll Risk Of Ruin (RoR)",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -523,18 +530,18 @@
           "default": 30
         }
       }
-    },
-    "annotations": {
-      "title": "Calculate Bankroll Risk of Ruin & Kelly Buffers",
-      "readOnlyHint": true,
-      "destructiveHint": false,
-      "idempotentHint": true,
-      "openWorldHint": false
     }
   },
   {
     "name": "calculate_bounty_chip_equity",
-    "description": "Convert a Progressive Knockout (PKO) or Mystery Bounty dollar amount (`bounty_dollars`) into equivalent tournament chips (`bountyChipValue`) and compute the bounty-adjusted pot odds and required calling equity when covering an all-in opponent. Pure read-only, deterministic calculation with zero side effects; combines `starting_stack`, `base_pool_buyin` (buy-in going to regular prize pool), `bounty_dollars`, and optional `pot_chips`/`call_chips` to return chip-equivalent value, Bounty Power Factor, and adjusted break-even equity JSON. Use this tool in PKO or Mystery Bounty tournaments when covering a shorter stack all-in. Do NOT use this tool for standard non-bounty final-table ICM equity (call `calculate_icm_payouts`) or standard cash-game pot odds (call `calculate_pot_odds_and_mdf`).",
+    "description": "Convert a Progressive Knockout (PKO) or Mystery Bounty dollar amount into tournament chip-equivalent value and compute bounty-adjusted required calling equity.",
+    "annotations": {
+      "title": "Calculate PKO & Mystery Bounty Chip Equity",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -564,18 +571,18 @@
           "default": 10000
         }
       }
-    },
-    "annotations": {
-      "title": "Convert PKO & Mystery Bounty to Tournament Chips",
-      "readOnlyHint": true,
-      "destructiveHint": false,
-      "idempotentHint": true,
-      "openWorldHint": false
     }
   },
   {
     "name": "calculate_side_pots",
-    "description": "Split a multi-way all-in confrontation (2 to 9 players) into exact Main Pot, sequential numbered Side Pots, eligible player lists for each pot, and any uncalled bet returned to the largest stack, optionally including `dead_money` (blinds, antes, or folded bets). Pure read-only, deterministic accounting calculation with zero side effects; `commitments` array lists each active player's total chip commitment (order preserved as Player 1..N), returning a JSON breakdown verifying chip conservation (`sum of pots + uncalled return == total committed + dead_money`). Use this tool to resolve dealer/floor pot-splitting math in multi-way all-ins. Do NOT use this tool for final-table prize pool deal splits (call `calculate_tournament_chop`).",
+    "description": "Calculate exact Multi-Way All-In Main Pot, Side Pots, and Uncalled Bet returns for 2 to 9 players plus dead money (blinds/antes/folded bets).",
+    "annotations": {
+      "title": "Calculate Multi-Way All-In Side Pots",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -609,18 +616,18 @@
       "required": [
         "contributions"
       ]
-    },
-    "annotations": {
-      "title": "Calculate Multi-Way All-In Main & Side Pots",
-      "readOnlyHint": true,
-      "destructiveHint": false,
-      "idempotentHint": true,
-      "openWorldHint": false
     }
   },
   {
     "name": "generate_blind_structure",
-    "description": "Generate a complete TDA-compliant tournament blind schedule (level numbers, small blind, big blind, Big Blind Ante, duration, elapsed clock time, and color-up race points) plus an optimal per-player starting chip denomination breakdown from `starting_stack`, `level_minutes`, `target_hours`, `expected_entries`, and `ante_format`. Pure read-only, deterministic schedule generator with zero side effects; returns a structured JSON schedule (~2-4 KB) and printable clock permalink (`https://smarter.poker/tools/blind-structure-calculator`). Use this tool when designing a home game or cardroom tournament structure. Do NOT use this tool to look up existing commercial tournament series schedules (call `search_tournament_series`).",
+    "description": "Generate a TDA-compliant poker tournament blind schedule and starting chip color distribution from starting stack, level duration, target hours, and ante format.",
+    "annotations": {
+      "title": "Generate Tournament Blind Structure Schedule",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -649,18 +656,18 @@
           "default": "bba"
         }
       }
-    },
-    "annotations": {
-      "title": "Generate TDA Tournament Blind Structure & Chip Set",
-      "readOnlyHint": true,
-      "destructiveHint": false,
-      "idempotentHint": true,
-      "openWorldHint": false
     }
   },
   {
     "name": "calculate_spr_sizing",
-    "description": "Compute postflop Stack-to-Pot Ratio (`SPR = effective_stack / pot_size`), Commitment Zone classification (`Low SPR < 3: Auto-Commit Top Pair+`, `Medium SPR 3-7`, `High SPR > 7: Deep Multi-Street`), and exact 1-street, 2-street, and 3-street Equal Geometric Bet Sizing percentages (`g = ((2*SPR + 1)^(1/N) - 1) / 2`) required to put all chips in by the river. Pure read-only, closed-form calculation with zero side effects; `pot_size` and `effective_stack` accept any positive unit (BBs or dollars), returning a compact JSON object (<1 KB). Use this tool for postflop bet-sizing geometry and stack-commitment planning. Do NOT use this tool for Pot-Limit Omaha maximum legal raise rules (call `calculate_plo_max_bet_and_rake`) or facing-bet pot odds (call `calculate_pot_odds_and_mdf`).",
+    "description": "Calculate exact Stack-To-Pot Ratio (SPR), Commitment Zone classification, and 1-street, 2-street, and 3-street Geometric Bet Sizing percentages.",
+    "annotations": {
+      "title": "Calculate Stack-To-Pot Ratio & Geometric Sizing",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -675,18 +682,18 @@
           "default": 10
         }
       }
-    },
-    "annotations": {
-      "title": "Calculate Stack-to-Pot Ratio (SPR) & Geometric Bet Sizing",
-      "readOnlyHint": true,
-      "destructiveHint": false,
-      "idempotentHint": true,
-      "openWorldHint": false
     }
   },
   {
     "name": "get_citation_and_backlink_kit",
-    "description": "Generate ready-to-paste HTML `<a href>` attribution snippets, responsive `<iframe>` calculator embeds (`?embed=true`), dynamic SVG badge URLs (`/api/seo/badge`), Forum BBCode, Wikipedia `{{cite web}}`, APA/MLA/BibTeX academic citations (with Zenodo dataset archive DOI `10.5281/zenodo.24095049`), and all 14 Nightbot/StreamElements/Fossabot live chat commands (`!odds`, `!potodds`, `!pushfold`, `!icm`, `!bounty`, `!winrate`, `!plo`, `!rake`, `!3bet`, `!rule`, `!chop`, `!outs`, `!variance`, `!matchup`) across 7 languages (`en`, `es`, `pt`, `de`, `fr`, `it`, `ja`). Pure read-only snippet generator with zero side effects; `target` selects the destination vertical and `lang` localizes anchor text, returning a JSON bundle (~3 KB) of copy-pasteable snippets. Use this tool when a publisher, blogger, academic researcher, or Twitch/YouTube streamer wants to embed a Smarter.Poker widget, cite a dataset, or install chatbot commands. Do NOT use this tool to retrieve the underlying research data tables themselves (call `get_research_report`).",
+    "description": "Retrieve ready-to-paste HTML backlinks, SVG authority/award badges, Markdown/Substack citations, TwoPlusTwo/CardsChat BBCode, Wikipedia {{cite web}} templates, BibTeX academic records, Zenodo DOIs, Software Heritage SWHIDs, Glama MCP listing, all 14 Twitch/YouTube streamer chatbot commands (!odds, !potodds, !pushfold, !icm, !bounty, !winrate, !plo, !rake, !3bet, !rule, !chop, !outs, !variance, !matchup), and multilingual embeds across 7 languages (en, es, pt, de, fr, it, ja).",
+    "annotations": {
+      "title": "Get Academic DOI Citation & Streamer Backlink Kit",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -726,18 +733,18 @@
           "default": "Your Publication"
         }
       }
-    },
-    "annotations": {
-      "title": "Generate Embed Widgets, Academic Citations & Streamer Commands",
-      "readOnlyHint": true,
-      "destructiveHint": false,
-      "idempotentHint": true,
-      "openWorldHint": false
     }
   },
   {
     "name": "lookup_poker_rule",
-    "description": "Look up official Poker Tournament Directors Association (TDA 2026) and Robert's Rules of Poker (RROP) floor rulings across all 30 Smarter.Poker rule guides (covering showdown order, verbal declarations, oversized chip rule, string bets, out-of-turn action, incomplete all-in reopening, odd chip award, dead hands, rabbit hunting, bomb pots, straddles, and hand-for-hand bubble play). Pure read-only reference lookup with zero side effects; pass `slug` or `query` to retrieve a specific floor procedure, penalty guideline, and dealer example (~2 KB JSON), or omit both to list all 30 rule slugs. Use this tool to adjudicate table disputes, floor calls, and procedural rules. Do NOT use this tool for game-variant dealing structures like Badugi or Razz (call `lookup_game_variant`) or general strategy definitions (call `get_poker_term_definition`).",
+    "description": "Look up official Poker Tournament Directors Association (TDA) and Robert's Rules of Poker (RROP) floor rulings across all 30 Smarter.Poker rule guides (showdown order, verbal declarations, oversized chip rule, string bets, action out of turn, short all-in reopening, odd chip award, dead button, rabbit hunting, and more).",
+    "annotations": {
+      "title": "Look Up Official TDA & RROP Floor Rule",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -746,18 +753,18 @@
           "description": "Rule slug or keyword (e.g. \"showdown-order-who-shows-first\", \"oversized-chip\", \"string-bet\", \"verbal\", \"reopen\"). Omit to list all 30 official floor rulings."
         }
       }
-    },
-    "annotations": {
-      "title": "Look Up Official TDA & Robert's Rules Floor Ruling",
-      "readOnlyHint": true,
-      "destructiveHint": false,
-      "idempotentHint": true,
-      "openWorldHint": false
     }
   },
   {
     "name": "lookup_game_variant",
-    "description": "Retrieve dealing rules, hole-card usage constraints (e.g., mandatory 2-from-hand in Omaha vs. Hold'em), betting structure (No-Limit, Pot-Limit, Fixed-Limit), hand-ranking system (High, Ace-to-Five Low, Deuce-to-Seven Low, Badugi), and top starting-hand tiers across 15 poker variants (`texas-holdem`, `pot-limit-omaha-plo4`, `five-card-omaha-plo5`, `six-card-omaha-plo6`, `omaha-hi-lo-o8`, `short-deck-six-plus`, `double-board-bomb-pot-plo`, `pineapple-and-crazy-pineapple`, `seven-card-stud`, `seven-card-stud-hi-lo`, `razz-seven-card-lowball`, `deuce-to-seven-triple-draw`, `no-limit-deuce-to-seven-single-draw`, `badugi-four-card-lowball`, `horse-and-eight-game-mix`). Pure read-only reference lookup with zero side effects; omit `variant` to list all 15 game slugs, or pass a slug/keyword to fetch the complete variant guide (~2.5 KB JSON). Use this tool when explaining how a poker variant is dealt, ranked, or played. Do NOT use this tool for floor penalty/dispute rulings (call `lookup_poker_rule`).",
+    "description": "Look up dealing rules, mandatory hole-card usage, betting structures, hand ranking systems, and starting hand strategy tiers across all 15 poker variants (Texas Hold'em, PLO4, PLO5, PLO6, Big O Hi-Lo, Short Deck 6+, Double-Board PLO Bomb Pots, Pineapple/Crazy Pineapple, 7-Card Stud, Stud Hi-Lo, Razz, 2-7 Triple Draw, NL 2-7 Single Draw, Badugi, H.O.R.S.E. & 8-Game Mix).",
+    "annotations": {
+      "title": "Look Up Poker Game Variant Rules & Strategy",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -766,18 +773,18 @@
           "description": "Variant slug or keyword (e.g. \"pot-limit-omaha-plo4\", \"short-deck-six-plus\", \"double-board-plo-bomb-pot\", \"razz\", \"badugi\"). Omit to list all 15 poker game variants."
         }
       }
-    },
-    "annotations": {
-      "title": "Look Up Poker Game Variant Rules & Starting Hand Tiers",
-      "readOnlyHint": true,
-      "destructiveHint": false,
-      "idempotentHint": true,
-      "openWorldHint": false
     }
   },
   {
     "name": "get_regional_market_guide",
-    "description": "Retrieve market-wide cardroom counts, rake vs. time-collection structures, buy-in caps, legal framework, flagship venues, and local player-pool adjustments across the 12 major US poker regions (`las-vegas-nevada`, `los-angeles-california`, `austin-san-antonio-texas`, `houston-texas`, `dallas-fort-worth-texas`, `south-florida-miami-hollywood`, `tampa-central-florida`, `atlantic-city-new-jersey`, `philadelphia-pennsylvania`, `new-england-connecticut-boston`, `chicagoland-midwest`, `phoenix-scottsdale-arizona`). Pure read-only reference lookup with zero side effects; omit `market` to list all 12 regional guide slugs, or pass a slug/city keyword to retrieve the full regional intelligence brief (~3 KB JSON). Use this tool when planning a poker trip or comparing regional rake/laws across a metro area. Do NOT use this tool to search individual rooms outside these 12 guides (call `search_poker_venues`) or fetch a single room's phone/schedule (call `get_venue_details`).",
+    "description": "Retrieve live poker room counts, rake/drop/time-collection structures, buy-in caps, flagship venues, and strategic adjustments across the 12 largest US live poker markets (Las Vegas, Los Angeles, Austin, Houston, Dallas, South Florida, Tampa, Atlantic City, Pennsylvania, Connecticut/New England, Northern California, and Arizona).",
+    "annotations": {
+      "title": "Get Regional US Live Poker Market Guide",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -786,18 +793,18 @@
           "description": "Market slug, city, or state code (e.g. \"las-vegas-nevada\", \"los-angeles-california\", \"houston-texas\", \"TX\", \"FL\"). Omit to list all 12 regional market guides."
         }
       }
-    },
-    "annotations": {
-      "title": "Get US Regional Live Poker Market Guide",
-      "readOnlyHint": true,
-      "destructiveHint": false,
-      "idempotentHint": true,
-      "openWorldHint": false
     }
   },
   {
     "name": "calculate_plo_max_bet_and_rake",
-    "description": "Compute the exact legal Pot-Limit Omaha (PLO) maximum raise total using the dealer shortcut (`Max Raise To = 3 * facing_bet + trail_calls + previous_pot`), the resulting pot size after the raise, and optional live cash-game rake drag in `$/hr` and `BB/100` from `rake_pct`, `rake_cap_dollars`, `promo_drop_dollars`, and `big_blind_dollars`. Pure read-only, deterministic calculation with zero side effects; all 7 parameters have sensible defaults so supplying only `previous_pot`, `facing_bet`, and `trail_calls` immediately returns the exact PLO pot-limit bet sizing alongside rake metrics in one JSON payload (<1 KB). Use this tool whenever calculating legal Pot-Limit raise totals or live cash rake drag. Do NOT use this tool for No-Limit geometric stack-to-pot sizing (call `calculate_spr_sizing`) or standard calling pot odds (call `calculate_pot_odds_and_mdf`).",
+    "description": "Compute exact Pot-Limit Omaha (PLO) maximum raise total (3x last bet + trail calls + center pot), preflop 3-bet/4-bet MDF, and live cash game rake cost in $/hr and BB/100 drag.",
+    "annotations": {
+      "title": "Calculate PLO Max Pot Raise & Live Rake Drag",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -837,18 +844,18 @@
           "default": 1
         }
       }
-    },
-    "annotations": {
-      "title": "Calculate PLO Pot-Limit Max Raise (3x+Pot) & Rake Drag",
-      "readOnlyHint": true,
-      "destructiveHint": false,
-      "idempotentHint": true,
-      "openWorldHint": false
     }
   },
   {
     "name": "calculate_tournament_chop",
-    "description": "Compute and compare three final-table tournament deal-making methods side-by-side—Malmuth-Harville ICM Chop, proportional Chip Chop, and Save-Amount Chop (setting aside `save_amount` for 1st place before splitting the remaining prize pool by ICM)—plus each player's dollar delta (`ICM Chop - Chip Chop`). Pure read-only, deterministic calculation with zero side effects; `stacks` and `payouts` must be arrays of positive numbers (`payouts` sum must exceed `save_amount`), returning a single JSON comparison table (<1.5 KB) with shareable permalink (`https://smarter.poker/tools/chop-calculator`). Use this tool when final-table players are negotiating a prize-pool chop/deal or setting aside money for the trophy. Do NOT use this tool for standard non-deal bubble EV lookups (call `calculate_icm_payouts`).",
+    "description": "Compute final-table deal payouts comparing Malmuth-Harville ICM Chop, proportional Chip Chop, and Save-Amount Chop (setting aside a trophy cash bonus for 1st place).",
+    "annotations": {
+      "title": "Calculate Final Table ICM & Chip Chop Deal",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -876,18 +883,18 @@
         "stacks",
         "payouts"
       ]
-    },
-    "annotations": {
-      "title": "Calculate Final-Table ICM Chop, Chip Chop & Save Deal",
-      "readOnlyHint": true,
-      "destructiveHint": false,
-      "idempotentHint": true,
-      "openWorldHint": false
     }
   },
   {
     "name": "simulate_poker_variance",
-    "description": "Compute expected profit (`EV` in BB), sample standard deviation (in BB and 100BB buy-ins), 68% (`±1σ`), 95% (`±1.96σ`), and 99.7% (`±3σ`) normal confidence intervals, probability of finishing at a net loss over `hands` played, and minimum hands required for 95% statistical confidence of being a winning player (`(1.96 * std_dev / winrate)^2 * 100`). Pure read-only, closed-form statistical calculation with zero side effects; accepts `winrate_bb_per_100`, `std_dev_bb_per_100`, and finite sample size `hands` (default 50,000), returning a JSON statistical summary (<1 KB). Use this tool to evaluate sample-size variance, confidence intervals, or probability of being down over a specific number of hands. Do NOT use this tool for infinite-horizon bankroll Risk of Ruin or buy-in buffer sizing (call `calculate_bankroll_risk_of_ruin` instead).",
+    "description": "Calculate expected profit (EV), standard deviation in BB and buy-ins, 68%/95%/99.7% normal confidence intervals, probability of loss over a sample, and minimum hands required for 95% statistical confidence.",
+    "annotations": {
+      "title": "Simulate Poker Variance & Confidence Intervals",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -907,18 +914,18 @@
           "default": 50000
         }
       }
-    },
-    "annotations": {
-      "title": "Calculate Sample Variance, Confidence Intervals & Loss Probability",
-      "readOnlyHint": true,
-      "destructiveHint": false,
-      "idempotentHint": true,
-      "openWorldHint": false
     }
   },
   {
     "name": "calculate_draw_outs",
-    "description": "Compute exact hypergeometric poker draw completion probabilities—Flop-to-Turn (`outs / 47`), Turn-to-River (`outs / 46`), and combined 2-card Flop-to-River (`1 - ((47 - outs)/47) * ((46 - outs)/46)`)—alongside Rule of 4 & 2 approximation error and required break-even pot odds ratio for `outs` (1 to 21) on a given `street` (`flop` or `turn`). Pure read-only, deterministic combinatorics calculation with zero side effects; returns exact percentages, odds ratios, and permalink (`https://smarter.poker/tools/outs-calculator`) in a compact JSON object (<1 KB). Use this tool when a player knows their number of clean outs (e.g., 8-out straight draw, 9-out flush draw, 15-out combo draw) and wants exact Turn/River hit probabilities and Rule of 4/2 comparison. Do NOT use this tool when a specific pot and facing bet size are given to evaluate call EV or MDF (call `calculate_pot_odds_and_mdf` instead).",
+    "description": "Compute exact hypergeometric poker draw probabilities (Turn %, River %, Flop-to-River %), Rule of 4 and 2 approximation error, and required break-even pot odds for 1 to 21 clean outs.",
+    "annotations": {
+      "title": "Calculate Hypergeometric Poker Draw Outs",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -937,24 +944,24 @@
           "default": "flop"
         }
       }
-    },
-    "annotations": {
-      "title": "Calculate Hypergeometric Draw Probabilities & Rule of 4/2 Error",
-      "readOnlyHint": true,
-      "destructiveHint": false,
-      "idempotentHint": true,
-      "openWorldHint": false
     }
   },
   {
     "name": "lookup_hand_matchup",
-    "description": "Look up pre-solved exact preflop win/tie/loss percentages, 1,326-combo card-removal breakdown, flop-texture equity shifts, and 100BB vs. 25BB stack-off EV guidelines for 25 canonical Texas Hold'em head-to-head matchups (e.g., `aa-vs-kk`, `ak-vs-qq`, `aks-vs-22`, `jj-vs-aks`, `kk-vs-aks`, `qq-vs-jj`, `77-vs-ak`). Pure read-only reference lookup with zero side effects; pass `slug` or two hand shorthands (`hand_a`, `hand_b`), or omit parameters to list all 25 canonical matchup slugs (~2 KB JSON). Use this tool for instant strategic and combinatorial breakdowns of classic 2-player preflop Hold'em all-in confrontations. Do NOT use this tool for custom 3+ player hands, Omaha variants, or specific postflop board cards (call `calculate_poker_odds` instead).",
+    "description": "Look up exact preflop win/tie/loss equity, combinatorics, flop texture equity shifts, and 100BB vs 25BB stack-off EV notes for canonical Texas Hold'em hand-vs-hand matchups (e.g. \"aa-vs-kk\", \"aks-vs-qq\", \"jj-vs-ako\", \"55-vs-kts\").",
+    "annotations": {
+      "title": "Look Up Canonical Preflop Hand-Vs-Hand Matchup",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
     "inputSchema": {
       "type": "object",
       "properties": {
         "slug": {
           "type": "string",
-          "description": "Matchup slug (e.g. \"aa-vs-kk\", \"ak-vs-qq\", \"jj-vs-aks\") or omit to list all 25 canonical matchups."
+          "description": "Matchup slug (e.g. \"aa-vs-kk\", \"aks-vs-qq\", \"jj-vs-ako\", \"55-vs-kts\") or omit to list all 25 canonical matchups."
         },
         "handA": {
           "type": "string",
@@ -965,13 +972,217 @@
           "description": "Optional second hand code (e.g. \"KK\", \"QQ\", \"AKo\")."
         }
       }
-    },
+    }
+  },
+  {
+    "name": "calculate_poker_taxes_w2g",
+    "description": "Calculates US federal/state poker tax liability, net taxable gambling income under Schedule A (itemized session loss deduction capped at winnings) vs Schedule C (professional player business expenses + self-employment tax), and IRS $5,000 Form W-2G reporting thresholds.",
     "annotations": {
-      "title": "Look Up Canonical Preflop Hold'em Hand-vs-Hand Matchup",
+      "title": "Calculate US Poker Taxes & Form W-2G Thresholds",
       "readOnlyHint": true,
       "destructiveHint": false,
       "idempotentHint": true,
       "openWorldHint": false
+    },
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "winning_sessions_dollars": {
+          "type": "number",
+          "description": "Total gross winning sessions in dollars for the tax year (default: 48000).",
+          "default": 48000
+        },
+        "losing_sessions_dollars": {
+          "type": "number",
+          "description": "Total gross losing sessions in dollars for the tax year (default: 22000).",
+          "default": 22000
+        },
+        "filing_status": {
+          "type": "string",
+          "enum": [
+            "recreational",
+            "pro"
+          ],
+          "description": "Tax filing classification: \"recreational\" (Form 1040 + Schedule A itemized losses) or \"pro\" (Schedule C professional gambler, default: \"recreational\").",
+          "default": "recreational"
+        },
+        "business_expenses_dollars": {
+          "type": "number",
+          "description": "Qualifying Schedule C poker business expenses such as travel, lodging, and buy-in fees (default: 3500).",
+          "default": 3500
+        },
+        "other_taxable_income_dollars": {
+          "type": "number",
+          "description": "Other annual non-gambling taxable income in dollars (default: 85000).",
+          "default": 85000
+        },
+        "single_tournament_net_profit_dollars": {
+          "type": "number",
+          "description": "Net profit (payout minus buy-in) from a single poker tournament to test the $5,000 IRS Form W-2G threshold (default: 6500).",
+          "default": 6500
+        }
+      }
+    }
+  },
+  {
+    "name": "calculate_staking_markup_split",
+    "description": "Calculates tournament staking package total value, markup price per %, investor share cost, breakeven ROI % required at the given markup, and net payouts for both investor and horse across a given gross cash amount.",
+    "annotations": {
+      "title": "Calculate Tournament Staking Markup & Payout Split",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "package_buyins_dollars": {
+          "type": "number",
+          "description": "Total face-value buy-ins in the tournament staking package in dollars (default: 10000).",
+          "default": 10000
+        },
+        "markup": {
+          "type": "number",
+          "description": "Markup multiplier applied to the package (e.g. 1.00 to 1.50, default: 1.15).",
+          "default": 1.15
+        },
+        "action_sold_percent": {
+          "type": "number",
+          "description": "Total percentage of action sold by the horse across all backers (default: 50).",
+          "default": 50
+        },
+        "investor_share_percent": {
+          "type": "number",
+          "description": "Percentage share purchased by an individual investor (default: 10).",
+          "default": 10
+        },
+        "gross_cashes_dollars": {
+          "type": "number",
+          "description": "Total gross tournament cashes and refunds at the end of the package (default: 24000).",
+          "default": 24000
+        },
+        "estimated_player_roi_percent": {
+          "type": "number",
+          "description": "Estimated true pre-markup player ROI % for EV analysis (default: 25).",
+          "default": 25
+        }
+      }
+    }
+  },
+  {
+    "name": "calculate_preflop_isolation_raise",
+    "description": "Calculates optimal pre-flop isolation raise sizing (3BB + 1BB per limper + 1BB OOP tax), projected heads-up flop pot size, and effective stack-to-pot ratio (SPR).",
+    "annotations": {
+      "title": "Calculate Pre-Flop Isolation Raise Sizing & SPR",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "limpers": {
+          "type": "integer",
+          "description": "Number of open-limpers ahead of Hero from 1 to 6 (default: 2).",
+          "default": 2
+        },
+        "position": {
+          "type": "string",
+          "enum": [
+            "IP",
+            "OOP"
+          ],
+          "description": "Hero postflop position relative to the limpers: \"IP\" (CO/BTN) or \"OOP\" (SB/BB, default: \"IP\").",
+          "default": "IP"
+        },
+        "effective_stack_bb": {
+          "type": "number",
+          "description": "Effective starting stack in Big Blinds (default: 100).",
+          "default": 100
+        },
+        "environment": {
+          "type": "string",
+          "enum": [
+            "online",
+            "live"
+          ],
+          "description": "Game environment: \"online\" (3BB base open) or \"live\" (4BB base open, default: \"online\").",
+          "default": "online"
+        },
+        "big_blind_dollars": {
+          "type": "number",
+          "description": "Dollar value of 1 Big Blind for live cash conversion (default: 5).",
+          "default": 5
+        }
+      }
+    }
+  },
+  {
+    "name": "calculate_home_game_chip_set",
+    "description": "Calculates optimal starting chip denomination tubes per player (4 to 5 denominations) and total physical chips required for a home cash game or tournament of players (2-30).",
+    "annotations": {
+      "title": "Calculate Home Game Chip Set Denomination Breakdown",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "players": {
+          "type": "integer",
+          "description": "Number of players in the home game from 2 to 30 (default: 8).",
+          "default": 8
+        },
+        "format": {
+          "type": "string",
+          "enum": [
+            "cash",
+            "tournament"
+          ],
+          "description": "Home game format: \"cash\" or \"tournament\" (default: \"cash\").",
+          "default": "cash"
+        },
+        "preset": {
+          "type": "string",
+          "enum": [
+            "cash-25-50",
+            "cash-1-2",
+            "t10000",
+            "t25000"
+          ],
+          "description": "Denomination preset: \"cash-25-50\" ($0.25/$0.50), \"cash-1-2\" ($1/$2), \"t10000\" (T10,000), or \"t25000\" (T25,000).",
+          "default": "cash-1-2"
+        },
+        "chip_set_size": {
+          "type": "integer",
+          "description": "Total chip case size (300, 500, or 1000, default: 500).",
+          "default": 500
+        }
+      }
+    }
+  },
+  {
+    "name": "get_poker_series_strategy_guide",
+    "description": "Returns the complete structure, late-registration window, bankroll plan, and venue survival guide for any major tournament series (wsop-las-vegas, wsop-circuit, wpt-world-championship, wynn-millions, venetian-deepstack, borgata-open, seminole-hard-rock-poker-open, run-good-poker-series, mspt-major, texas-card-house-series) or \"first-time-guide\" for first-time live poker room etiquette.",
+    "annotations": {
+      "title": "Get Major Poker Series Strategy Or First-Time Live Guide",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "slug": {
+          "type": "string",
+          "description": "Series slug or alias (e.g. \"wsop-las-vegas\", \"wsop\", \"wsop-circuit\", \"wpt-world-championship\", \"wpt\", \"wynn-millions\", \"venetian-deepstack\", \"borgata-open\", \"seminole-hard-rock-poker-open\", \"run-good-poker-series\", \"mspt-major\", \"mspt\", \"texas-card-house-series\", or \"first-time-guide\"). Omit to list all 10 canonical series guides."
+        }
+      }
     }
   }
 ]
