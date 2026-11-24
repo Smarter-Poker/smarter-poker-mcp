@@ -279,7 +279,7 @@
   },
   {
     "name": "get_freeroll_schedule",
-    "description": "Retrieve the upcoming Daily $2,000 Freerolls and Diamond Arena Freerolls schedule, formats, prize values, and entry requirements on Smarter.Poker.",
+    "description": "Retrieve the daily Free Buy freeroll schedule (five free No-Limit Hold'em tournaments a day), prize guarantees in chips, and entry requirements on Smarter.Poker.",
     "annotations": {
       "title": "Get Daily Freeroll Tournament Schedule",
       "readOnlyHint": true,
@@ -297,7 +297,7 @@
             "open",
             "diamond"
           ],
-          "description": "Filter by freeroll tier: \"open\" for daily open tournaments, \"diamond\" for Diamond Arena VIP events, or \"all\".",
+          "description": "Filter by freeroll tier: \"open\" for daily open tournaments, \"diamond\" for Diamond Arena availability (no funded events currently open), or \"all\".",
           "default": "all"
         }
       }
@@ -686,7 +686,7 @@
   },
   {
     "name": "get_citation_and_backlink_kit",
-    "description": "Retrieve ready-to-paste HTML backlinks, SVG authority/award badges, Markdown/Substack citations, TwoPlusTwo/CardsChat BBCode, Wikipedia {{cite web}} templates, BibTeX academic records, Zenodo DOIs, Software Heritage SWHIDs, Glama MCP listing, all 14 Twitch/YouTube streamer chatbot commands (!odds, !potodds, !pushfold, !icm, !bounty, !winrate, !plo, !rake, !3bet, !rule, !chop, !outs, !variance, !matchup), and multilingual embeds across 7 languages (en, es, pt, de, fr, it, ja).",
+    "description": "Retrieve ready-to-paste HTML backlinks, SVG authority/award badges, Markdown/Substack citations, TwoPlusTwo/CardsChat BBCode, Wikipedia {{cite web}} templates, BibTeX academic records, Zenodo DOIs, Software Heritage SWHIDs, Glama MCP listing, all 18 Twitch/YouTube streamer chatbot commands (!odds, !potodds, !pushfold, !icm, !bounty, !winrate, !plo, !rake, !3bet, !rule, !chop, !outs, !variance, !matchup, !tax, !stake, !iso, !series), and multilingual embeds across 7 languages (en, es, pt, de, fr, it, ja).",
     "annotations": {
       "title": "Get Academic DOI Citation & Streamer Backlink Kit",
       "readOnlyHint": true,
@@ -1181,6 +1181,434 @@
         "slug": {
           "type": "string",
           "description": "Series slug or alias (e.g. \"wsop-las-vegas\", \"wsop\", \"wsop-circuit\", \"wpt-world-championship\", \"wpt\", \"wynn-millions\", \"venetian-deepstack\", \"borgata-open\", \"seminole-hard-rock-poker-open\", \"run-good-poker-series\", \"mspt-major\", \"mspt\", \"texas-card-house-series\", or \"first-time-guide\"). Omit to list all 10 canonical series guides."
+        }
+      }
+    }
+  },
+  {
+    "name": "analyze_flop_board_texture",
+    "description": "Analyzes a 3-card flop (e.g. \"As,Kh,7d\" or \"QsJsTs\") for suit texture (Rainbow, Two-Tone, Monotone), board pairing (Unpaired, Paired, Trips), connectedness, PFR vs BB range/nut advantage, and recommended GTO C-Bet sizing and frequency.",
+    "annotations": {
+      "title": "Analyze Flop Board Texture & GTO C-Bet Sizing",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "flop": {
+          "type": "string",
+          "description": "Three flop cards (e.g. \"As,Kh,7d\", \"QsJsTs\", or \"8d7c6d\")"
+        },
+        "pot_type": {
+          "type": "string",
+          "enum": [
+            "srp",
+            "3bet",
+            "4bet"
+          ],
+          "description": "Pot type: \"srp\" (Single Raised Pot, default), \"3bet\", or \"4bet\""
+        }
+      },
+      "required": [
+        "flop"
+      ]
+    }
+  },
+  {
+    "name": "calculate_tournament_m_ratio",
+    "description": "Computes Dan Harrington's M-Ratio, short-handed Effective M-Ratio, Q-Ratio (stack vs average stack), Orbit Cost, Zone Classification (Green, Yellow, Orange, Red, Dead Zone), and minutes remaining before blinding out.",
+    "annotations": {
+      "title": "Calculate Tournament M-Ratio, Effective M & Zone",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "stack": {
+          "type": "number",
+          "description": "Hero chip stack (e.g. 25000)"
+        },
+        "small_blind": {
+          "type": "number",
+          "description": "Current small blind (e.g. 500)"
+        },
+        "big_blind": {
+          "type": "number",
+          "description": "Current big blind (e.g. 1000)"
+        },
+        "ante_total": {
+          "type": "number",
+          "description": "Total ante posted per hand (e.g. 1000 for a 1000 Big Blind Ante)"
+        },
+        "players_at_table": {
+          "type": "integer",
+          "description": "Active players dealt in at the table (2-10, default 9)"
+        },
+        "average_stack": {
+          "type": "number",
+          "description": "Tournament average stack for Q-Ratio calculation (optional, e.g. 40000)"
+        },
+        "hands_per_hour": {
+          "type": "number",
+          "description": "Hands dealt per hour (default 30 for live, 75 for online)"
+        }
+      },
+      "required": [
+        "stack",
+        "small_blind",
+        "big_blind"
+      ]
+    }
+  },
+  {
+    "name": "calculate_cash_session_plan",
+    "description": "Computes net hourly cash game profit ($/hr) factoring in BB/100 winrate, hands per hour, casino hourly comps, tips, and session expenses, plus monthly/annual income projection, recommended stop-loss buy-ins, and 5% Risk-of-Ruin bankroll requirement.",
+    "annotations": {
+      "title": "Calculate Cash Game Session Plan & Net Hourly EV",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "big_blind_dollars": {
+          "type": "number",
+          "description": "Big blind in dollars (e.g. 3 for $1/$3, 5 for $2/$5)"
+        },
+        "winrate_bb100": {
+          "type": "number",
+          "description": "Expected true winrate in BB/100 hands (e.g. 8 for live, 4 for online)"
+        },
+        "hands_per_hour": {
+          "type": "number",
+          "description": "Hands dealt per hour (default 28 for live, 85 for online)"
+        },
+        "comps_per_hour_dollars": {
+          "type": "number",
+          "description": "Casino player reward comps earned per hour in dollars (default 2.0)"
+        },
+        "expenses_per_hour_dollars": {
+          "type": "number",
+          "description": "Average hourly session expenses/food/travel in dollars (default 3.0)"
+        },
+        "hours_per_month": {
+          "type": "number",
+          "description": "Planned playing hours per month (default 80)"
+        },
+        "std_dev_bb100": {
+          "type": "number",
+          "description": "Standard deviation in BB/100 hands (default 75 for live, 90 for online)"
+        }
+      },
+      "required": [
+        "big_blind_dollars"
+      ]
+    }
+  },
+  {
+    "name": "calculate_straddle_bomb_pot_ev",
+    "description": "Computes live cash game UTG vs Button (Mississippi) straddle effective stack reduction, halved SPR, required steal fold-equity, and single-board vs double-board bomb pot dead money and minimum flop equity to commit.",
+    "annotations": {
+      "title": "Calculate Live Straddle & Bomb Pot EV Math",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "small_blind": {
+          "type": "number",
+          "description": "Small blind in dollars (e.g. 1 or 2)"
+        },
+        "big_blind": {
+          "type": "number",
+          "description": "Big blind in dollars (e.g. 3 or 5)"
+        },
+        "straddle_amount": {
+          "type": "number",
+          "description": "Straddle size in dollars (default 2x big blind)"
+        },
+        "straddle_type": {
+          "type": "string",
+          "enum": [
+            "utg",
+            "button",
+            "sleeper"
+          ],
+          "description": "Straddle position type: \"utg\" (default), \"button\" (Mississippi), or \"sleeper\""
+        },
+        "effective_stack_dollars": {
+          "type": "number",
+          "description": "Effective stack in dollars (default 100x big blind)"
+        },
+        "bomb_pot_ante_dollars": {
+          "type": "number",
+          "description": "Bomb pot ante per player in dollars (default 5x big blind)"
+        },
+        "players": {
+          "type": "integer",
+          "description": "Number of players dealt into the bomb pot (default 8)"
+        },
+        "boards": {
+          "type": "integer",
+          "enum": [
+            1,
+            2
+          ],
+          "description": "Number of bomb pot boards dealt: 1 (single-board) or 2 (double-board split pot, default 2)"
+        }
+      }
+    }
+  },
+  {
+    "name": "format_poker_hand_history",
+    "description": "Formats a structured or raw poker hand history into clean Reddit/Discord markdown with street-by-street pot size, Geometric SPR progression, and a shareable /tools/hand-converter URL.",
+    "annotations": {
+      "title": "Format Poker Hand History For Reddit & Discord",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "stakes": {
+          "type": "string",
+          "description": "Stakes and game format (e.g. \"$2/$5 NLH Live 9-Max\" or \"100NL 6-Max Online\")"
+        },
+        "effective_stack_bb": {
+          "type": "number",
+          "description": "Effective starting stack in Big Blinds (default 100)"
+        },
+        "hero_position": {
+          "type": "string",
+          "description": "Hero seat position (e.g. \"BTN\", \"CO\", \"BB\")"
+        },
+        "villain_position": {
+          "type": "string",
+          "description": "Main Villain seat position (e.g. \"BB\", \"UTG\", \"SB\")"
+        },
+        "hero_cards": {
+          "type": "string",
+          "description": "Hero hole cards (e.g. \"AsKs\" or \"QhQd\")"
+        },
+        "preflop_action": {
+          "type": "string",
+          "description": "Summary of preflop action (e.g. \"UTG opens 3BB, Hero 3-bets 9BB on BTN, UTG calls\")"
+        },
+        "flop_board": {
+          "type": "string",
+          "description": "Flop cards (e.g. \"Kh 9s 4d\")"
+        },
+        "flop_pot_bb": {
+          "type": "number",
+          "description": "Pot size entering the flop in BB (default 19.5)"
+        },
+        "flop_action": {
+          "type": "string",
+          "description": "Flop betting action (e.g. \"Villain checks, Hero C-bets 6.5BB, Villain calls\")"
+        },
+        "turn_card": {
+          "type": "string",
+          "description": "Turn card (e.g. \"2c\")"
+        },
+        "turn_action": {
+          "type": "string",
+          "description": "Turn betting action (optional)"
+        },
+        "river_card": {
+          "type": "string",
+          "description": "River card (e.g. \"Jd\")"
+        },
+        "river_action": {
+          "type": "string",
+          "description": "River betting action (optional)"
+        }
+      }
+    }
+  },
+  {
+    "name": "calculate_satellite_bubble_factor",
+    "description": "Computes tournament satellite target seat stack, current seat-lock probability, Satellite Bubble Factor, and the exact calling equity threshold near a \"Win-A-Seat\" milestone or survival bubble.",
+    "annotations": {
+      "title": "Calculate Satellite Bubble Factor & Seat-Lock Threshold",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "players_remaining": {
+          "type": "integer",
+          "description": "Players currently remaining in the satellite (e.g. 12)"
+        },
+        "seats_awarded": {
+          "type": "integer",
+          "description": "Number of identical prize seats awarded (e.g. 10)"
+        },
+        "hero_stack": {
+          "type": "number",
+          "description": "Hero current chip stack (e.g. 45000)"
+        },
+        "total_chips_in_play": {
+          "type": "number",
+          "description": "Total chips in play across all remaining players (optional; defaults to players_remaining * 35000)"
+        },
+        "seat_package_value_dollars": {
+          "type": "number",
+          "description": "Dollar value of each prize seat or package (default 10000)"
+        }
+      },
+      "required": [
+        "players_remaining",
+        "seats_awarded"
+      ]
+    }
+  },
+  {
+    "name": "calculate_bad_beat_jackpot_ev",
+    "description": "Computes live poker Bad Beat Jackpot (BBJ) qualifier hit probability per hand, player/table/room share dollar EV, high-hand promotion EV, and exact breakeven jackpot pool threshold.",
+    "annotations": {
+      "title": "Calculate Bad Beat Jackpot & High-Hand Promo EV",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "jackpot_pool_dollars": {
+          "type": "number",
+          "description": "Current Bad Beat Jackpot prize pool in dollars (e.g. 250000)"
+        },
+        "qualifier": {
+          "type": "string",
+          "enum": [
+            "quads-8s",
+            "quads-tens",
+            "quads-jacks",
+            "aces-full-of-tens",
+            "aces-full-of-kings"
+          ],
+          "description": "Minimum losing hand qualifier (default \"aces-full-of-tens\")"
+        },
+        "promo_drop_dollars": {
+          "type": "number",
+          "description": "Jackpot promotional drop taken per qualifying pot in dollars (default 1.0)"
+        },
+        "table_share_percent": {
+          "type": "number",
+          "description": "Percentage of jackpot shared among all seated players at the table (default 25)"
+        },
+        "loser_share_percent": {
+          "type": "number",
+          "description": "Percentage of jackpot awarded to the losing qualifying hand (default 40)"
+        },
+        "winner_share_percent": {
+          "type": "number",
+          "description": "Percentage of jackpot awarded to the winning hand (default 20)"
+        },
+        "players_at_table": {
+          "type": "integer",
+          "description": "Active players seated at the table (default 9)"
+        },
+        "high_hand_prize_dollars": {
+          "type": "number",
+          "description": "Optional hourly/half-hourly High-Hand promotion prize in dollars (default 500)"
+        },
+        "active_tables_in_room": {
+          "type": "integer",
+          "description": "Number of eligible tables competing for the High-Hand promotion (default 15)"
+        }
+      },
+      "required": [
+        "jackpot_pool_dollars"
+      ]
+    }
+  },
+  {
+    "name": "resolve_holdem_showdown_winner",
+    "description": "Evaluates two 2-card Texas Hold'em hands across a 5-card community board and returns the exact winning 5-card hand, hand rank category, kicker explanation, or split-pot ruling.",
+    "annotations": {
+      "title": "Resolve Hold'em 7-Card Showdown Winner & Kicker",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "hand_a": {
+          "type": "string",
+          "description": "Player A two hole cards (e.g. \"AsKd\" or \"Ah,Qh\")"
+        },
+        "hand_b": {
+          "type": "string",
+          "description": "Player B two hole cards (e.g. \"AcJc\" or \"Ks,Qd\")"
+        },
+        "board": {
+          "type": "string",
+          "description": "Five community board cards (e.g. \"AdKh9c9s2d\" or \"Ah,Kd,9c,9s,2d\")"
+        }
+      },
+      "required": [
+        "hand_a",
+        "hand_b",
+        "board"
+      ]
+    }
+  },
+  {
+    "name": "get_poker_position_strategy",
+    "description": "Returns GTO Raise-First-In (RFI) %, 3-Bet %, cold-call %, expected BB/100 winrate, and positional strategy for any 9-max or 6-max poker seat (utg, utg-1, mp, lj, hj, co, btn, sb, bb), linking to /learn/positions/[pos].",
+    "annotations": {
+      "title": "Get Poker Seat Position GTO Ranges & Winrate",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "position": {
+          "type": "string",
+          "description": "Table seat position slug or alias (e.g. \"utg\", \"utg-1\", \"mp\", \"lj\", \"hj\", \"co\", \"btn\", \"sb\", \"bb\"). Omit to list all 9 canonical positions."
+        }
+      }
+    }
+  },
+  {
+    "name": "get_us_state_poker_guide",
+    "description": "Returns legal real-money live and online poker status, minimum casino age, state tax withholding rate, typical cardroom rake model, and top poker cities for top US states, linking to /poker-rooms/states/[state].",
+    "annotations": {
+      "title": "Get US State Poker Legal Status, Rake & Tax Guide",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "state": {
+          "type": "string",
+          "description": "US state slug, name, or 2-letter code (e.g. \"nevada\", \"nv\", \"texas\", \"tx\", \"california\", \"florida\", \"new-jersey\", \"pennsylvania\", \"michigan\"). Omit to list all covered states."
         }
       }
     }

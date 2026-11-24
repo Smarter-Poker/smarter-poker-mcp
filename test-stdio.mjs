@@ -1,5 +1,42 @@
 import { spawn } from 'node:child_process';
 import assert from 'node:assert/strict';
+import {
+  TOOLS,
+  PROMPTS,
+  RESOURCE_TEMPLATES,
+  TOOL_NAME_ALIASES,
+  STREAMER_COMMANDS,
+  executeTool,
+  forwardRpc,
+} from './src/index.mjs';
+
+assert.equal(TOOLS.length, 45, `Expected 45 TOOLS, got ${TOOLS.length}`);
+assert.equal(PROMPTS.length, 10, `Expected 10 PROMPTS, got ${PROMPTS.length}`);
+assert.equal(RESOURCE_TEMPLATES.length, 16, `Expected 16 RESOURCE_TEMPLATES, got ${RESOURCE_TEMPLATES.length}`);
+assert.equal(STREAMER_COMMANDS.length, 26, `Expected 26 STREAMER_COMMANDS, got ${STREAMER_COMMANDS.length}`);
+
+const newTools = [
+  'analyze_flop_board_texture',
+  'calculate_tournament_m_ratio',
+  'calculate_cash_session_plan',
+  'calculate_straddle_bomb_pot_ev',
+  'format_poker_hand_history',
+  'calculate_satellite_bubble_factor',
+  'calculate_bad_beat_jackpot_ev',
+  'resolve_holdem_showdown_winner',
+  'get_poker_position_strategy',
+  'get_us_state_poker_guide',
+];
+
+for (const toolName of newTools) {
+  const res = await executeTool(toolName, {});
+  assert.equal(res.tool, toolName);
+}
+
+for (const [alias, canonical] of Object.entries(TOOL_NAME_ALIASES)) {
+  const res = await executeTool(alias, {});
+  assert.equal(res.tool, canonical);
+}
 
 const proc = spawn('node', ['./bin/smarter-poker-mcp.mjs'], {
   cwd: new URL('.', import.meta.url).pathname,
@@ -21,18 +58,21 @@ function send(msg) {
 
 send({ jsonrpc: '2.0', id: 1, method: 'initialize', params: { protocolVersion: '2024-11-05' } });
 send({ jsonrpc: '2.0', id: 2, method: 'tools/list', params: {} });
+send({ jsonrpc: '2.0', id: 3, method: 'prompts/list', params: {} });
 send({
   jsonrpc: '2.0',
-  id: 3,
+  id: 4,
   method: 'tools/call',
   params: { name: 'calculate_pot_odds_and_mdf', arguments: { pot: 100, bet: 50, outs: 9 } },
 });
 
 setTimeout(() => {
   proc.kill();
-  assert.equal(responses.length, 3, `Expected 3 responses, got ${responses.length}`);
+  assert.equal(responses.length, 4, `Expected 4 responses, got ${responses.length}`);
   assert.equal(responses[0].result.serverInfo.name, 'smarter-poker-mcp-server');
-  assert.ok(responses[1].result.tools.length >= 3);
-  assert.ok(JSON.stringify(responses[2].result).includes('pot-odds-calculator'));
-  console.log('STDIO MCP TEST PASSED:', responses.length, 'tools:', responses[1].result.tools.length);
+  assert.equal(responses[0].result.serverInfo.version, '1.0.6');
+  assert.equal(responses[1].result.tools.length, 45);
+  assert.equal(responses[2].result.prompts.length, 10);
+  assert.ok(JSON.stringify(responses[3].result).includes('pot-odds-calculator'));
+  console.log('STDIO MCP TEST PASSED:', responses.length, 'tools:', responses[1].result.tools.length, 'prompts:', responses[2].result.prompts.length);
 }, 2500);

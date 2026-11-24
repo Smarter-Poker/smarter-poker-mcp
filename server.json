@@ -1,0 +1,34 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-10-17/server.schema.json",
+  "name": "io.github.Smarter-Poker/smarter-poker-mcp",
+  "title": "Smarter.Poker Quantitative Poker & Live Venue MCP Server",
+  "description": "Zero-auth Model Context Protocol (MCP) server providing 45 deterministic poker equity, Malmuth-Harville ICM, tournament chop, Flop Board Texture, Harrington M-Ratio, Satellite Bubble Factor, Straddle & Bomb Pot EV, Bad Beat Jackpot EV, Cash Session Planner, 7-Card Showdown Resolver, Hand History Formatter, GTO 169-hand preflop range, 25 canonical hand-vs-hand matchups, 9 table position guides, 15 US state poker law guides, 10 major poker series strategy guides, US poker tax, tournament staking markup, live rake vs time-collection, 30 TDA floor rulings, 15 game variants, 12 regional market guides, and North American live poker room intelligence tools, plus 10 prompts, 16 resource templates, and 26 streamer commands.",
+  "version": "1.0.6",
+  "websiteUrl": "https://smarter.poker",
+  "repository": {
+    "url": "https://github.com/Smarter-Poker/smarter-poker-mcp",
+    "source": "github"
+  },
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "@smarter-poker/mcp-server",
+      "version": "1.0.6",
+      "transport": {
+        "type": "stdio"
+      }
+    }
+  ],
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://smarter.poker/api/mcp"
+    }
+  ],
+  "capabilities": {
+    "toolsCount": 45,
+    "promptsCount": 10,
+    "resourceTemplatesCount": 16,
+    "streamerCommandsCount": 26
+  }
+}

@@ -1,7 +1,7 @@
 {
   "name": "@smarter-poker/mcp-server",
-  "version": "1.0.5",
-  "description": "Official Smarter.Poker Model Context Protocol (MCP) Server — 35 tools for live poker room search, tournament series schedules, equity/ICM/push-fold/chop/variance/outs calculators, TDA rule rulings, 25 preflop matchups, 6 Zenodo dataset DOIs, and 1,841 verified canonical poker pages.",
+  "version": "1.0.6",
+  "description": "Official Smarter.Poker Model Context Protocol (MCP) Server — 45 zero-auth tools, 10 prompts, 16 resource templates, and 26 streamer commands for live poker room search, tournament series schedules, equity/ICM/M-Ratio/Satellite/Chop/Variance/Outs/Board-Texture/Showdown calculators, US state poker law, 9 positional GTO guides, TDA rule rulings, 25 preflop matchups, and 6 Zenodo dataset DOIs.",
   "type": "module",
   "homepage": "https://smarter.poker/api/mcp",
   "repository": {
@@ -16,7 +16,11 @@
   "bin": {
     "smarter-poker-mcp": "./bin/smarter-poker-mcp.mjs"
   },
-  "main": "./bin/smarter-poker-mcp.mjs",
+  "main": "./src/index.mjs",
+  "exports": {
+    ".": "./src/index.mjs",
+    "./bin": "./bin/smarter-poker-mcp.mjs"
+  },
   "engines": {
     "node": ">=18.0.0"
   },

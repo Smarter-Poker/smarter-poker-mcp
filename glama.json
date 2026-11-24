@@ -1,4 +1,9 @@
 {
   "$schema": "https://glama.ai/mcp/schemas/server.json",
-  "maintainers": ["Smarter-Poker"]
+  "maintainers": ["Smarter-Poker"],
+  "version": "1.0.6",
+  "toolsCount": 45,
+  "promptsCount": 10,
+  "resourceTemplatesCount": 16,
+  "streamerCommandsCount": 26
 }
