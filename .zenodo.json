@@ -1,0 +1,65 @@
+{
+  "title": "Smarter.Poker Model Context Protocol (MCP) Server & OpenAPI 3.1 Specification (v1.0.7 — 55 Zero-Auth Tools & 12 Prompts)",
+  "version": "1.0.7",
+  "upload_type": "software",
+  "publication_date": "2026-11-24",
+  "description": "Open-source Model Context Protocol (MCP) server for Smarter.Poker providing 55 deterministic zero-auth poker mathematics, GTO strategy, tournament ICM/M-Ratio/Satellite/Chop/Bounty/Late-Reg/ABI solvers, PLO wrap & 3x+pot calculators, geometric bet sizing, winrate confidence intervals, live table selection & trip budget planners, player archetype exploits, canonical flop board texture guides, US state poker law, international poker destination guides, table position GTO benchmarks, North American live poker room directory, tournament series schedules, and TDA floor ruling tools, plus 12 structured prompt workflows, 18 resource templates, 41 interactive calculators (42 total /tools pages), and 34 streamer chatbot commands.",
+  "license": "mit",
+  "access_right": "open",
+  "creators": [
+    {
+      "name": "Smarter.Poker Research Division",
+      "affiliation": "Smarter.Poker"
+    }
+  ],
+  "keywords": [
+    "model-context-protocol",
+    "mcp-server",
+    "poker",
+    "texas-holdem",
+    "pot-limit-omaha",
+    "gto-solver",
+    "icm-calculator",
+    "pot-odds",
+    "cardroom-directory",
+    "tournament-poker"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "10.5281/zenodo.24115636",
+      "relation": "isIdenticalTo",
+      "resource_type": "software",
+      "scheme": "doi"
+    },
+    {
+      "identifier": "10.5281/zenodo.24095056",
+      "relation": "isVersionOf",
+      "resource_type": "software",
+      "scheme": "doi"
+    },
+    {
+      "identifier": "10.5281/zenodo.24115453",
+      "relation": "isSupplementedBy",
+      "resource_type": "dataset",
+      "scheme": "doi"
+    },
+    {
+      "identifier": "10.5281/zenodo.24095049",
+      "relation": "isSupplementTo",
+      "resource_type": "dataset",
+      "scheme": "doi"
+    },
+    {
+      "identifier": "https://smarter.poker/api/mcp",
+      "relation": "isDocumentedBy",
+      "resource_type": "other",
+      "scheme": "url"
+    },
+    {
+      "identifier": "https://smarter.poker/tools",
+      "relation": "isDocumentedBy",
+      "resource_type": "other",
+      "scheme": "url"
+    }
+  ]
+}

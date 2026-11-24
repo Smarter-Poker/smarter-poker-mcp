@@ -226,7 +226,7 @@ export const RESOURCE_TEMPLATES = [
   {
     uriTemplate: 'https://smarter.poker/tools/{calculator}.md',
     name: 'Smarter.Poker Interactive Poker Math Calculator Markdown',
-    description: 'Raw Markdown mathematical specification and benchmark tables for any of the 42 free interactive poker calculators.',
+    description: 'Raw Markdown mathematical specification and benchmark tables for any of the 41 free interactive poker calculators (42 total /tools pages).',
     mimeType: 'text/markdown',
   },
   {
