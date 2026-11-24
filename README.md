@@ -1,9 +1,9 @@
-# Smarter.Poker Model Context Protocol (MCP) Server (`v1.0.6`)
+# Smarter.Poker Model Context Protocol (MCP) Server (`v1.0.7`)
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24095057.svg)](https://doi.org/10.5281/zenodo.24095057)
 [![Glama MCP Server](https://glama.ai/mcp/servers/Smarter-Poker/smarter-poker-mcp/badges/score.svg)](https://glama.ai/mcp/servers/Smarter-Poker/smarter-poker-mcp)
 
-Open-source Model Context Protocol (MCP) server for Smarter.Poker providing **45 zero-auth read-only tools**, **10 prompt workflows**, **16 resource templates**, and **26 streamer chat commands** for poker equity calculation, Game Theory Optimal (GTO) preflop ranges, Malmuth-Harville Independent Chip Model (ICM) payouts, Harrington M-Ratio & Effective M, Satellite Bubble Factor & seat-lock thresholds, Flop Board Texture & GTO C-Bet sizing, 7-Card Texas Hold'em Showdown resolution, Cash Game Session planning, Straddle & Double-Board Bomb Pot EV, Bad Beat Jackpot & High-Hand promotion EV, Reddit/Discord Hand History formatting, Pot-Limit Omaha (PLO) bet-sizing, US W-2G poker tax estimation, tournament staking markup, preflop isolation sizing, home-game chip sets, 9 table position GTO guides, 15 US state poker law guides, live North American cardroom directory queries, tournament series schedules, and Tournament Directors Association (TDA) floor rulings over both local `stdio` (`npx` / Docker) and remote Streamable HTTP (`https://smarter.poker/api/mcp`).
+Open-source Model Context Protocol (MCP) server for Smarter.Poker providing **55 zero-auth read-only tools**, **12 prompt workflows**, **18 resource templates**, and **34 streamer chat commands** for poker equity calculation, Game Theory Optimal (GTO) preflop ranges, Malmuth-Harville Independent Chip Model (ICM) payouts, Harrington M-Ratio & Effective M, Satellite Bubble Factor & seat-lock thresholds, Tournament Late-Registration ICM chip appreciation, MTT Session ABI exposure & 0-ITM brick risk, Multi-Street 2e & 3e Geometric Bet Sizing, 4-Card & 5-Card PLO Straight Wrap Outs & 3x+pot bet-sizing, Winrate 70%/95%/99% Confidence Intervals, Live Cash Table Selection scoring, Poker Festival Travel Overhead & Trip Budgeting, Flop Board Texture & GTO C-Bet sizing, 7-Card Texas Hold'em Showdown resolution, Cash Game Session planning, Straddle & Double-Board Bomb Pot EV, Bad Beat Jackpot & High-Hand promotion EV, Reddit/Discord Hand History formatting, US W-2G poker tax estimation, tournament staking markup, preflop isolation sizing, home-game chip sets, 9 table position GTO guides, 8 player archetype exploitative guides, 12 canonical flop board texture guides, 15 US state poker law guides, 10 international poker destination guides, live North American cardroom directory queries, tournament series schedules, and Tournament Directors Association (TDA) floor rulings over both local `stdio` (`npx` / Docker) and remote Streamable HTTP (`https://smarter.poker/api/mcp`).
 
 ## Verified Registry Listings
 
@@ -37,9 +37,9 @@ Open-source Model Context Protocol (MCP) server for Smarter.Poker providing **45
 }
 ```
 
-## 45-Tool Reference & Web Documentation
+## 55-Tool Reference & Web Documentation
 
-### 1. Poker Mathematics, Equity & Tournament Solvers (`27 Solvers` — `/tools/*`)
+### 1. Poker Mathematics, Equity & Tournament Solvers (`34 Solvers` — `/tools/*`)
 1. `calculate_poker_odds` — [Hold'em & Omaha Poker Equity Calculator](https://smarter.poker/tools/poker-odds-calculator)
 2. `lookup_hand_matchup` — [Preflop Hold'em All-In Matchup Reference (25 Matchups)](https://smarter.poker/learn/matchups)
 3. `calculate_draw_outs` — [Hypergeometric Draw Outs & Rule of 4 and 2 Calculator](https://smarter.poker/tools/outs-calculator)
@@ -67,28 +67,38 @@ Open-source Model Context Protocol (MCP) server for Smarter.Poker providing **45
 25. `calculate_satellite_bubble_factor` — [Satellite Seat-Lock Threshold & Bubble Factor Calculator](https://smarter.poker/tools/satellite-calculator)
 26. `calculate_bad_beat_jackpot_ev` — [Bad Beat Jackpot (BBJ) & High-Hand Promotion EV Calculator](https://smarter.poker/tools/promo-ev-calculator)
 27. `resolve_holdem_showdown_winner` — [7-Card Texas Hold'em Showdown Winner, Kicker & Split-Pot Resolver](https://smarter.poker/tools/who-wins-calculator)
+28. `calculate_plo_wrap_outs` — [4-Card & 5-Card PLO Straight Wrap Outs & Flush Redraw Equity Calculator](https://smarter.poker/tools/plo-outs-calculator)
+29. `calculate_late_reg_icm_ev` — [Tournament Late-Registration ICM Chip Appreciation & Equity Boost Calculator](https://smarter.poker/tools/late-reg-calculator)
+30. `calculate_winrate_confidence_interval` — [Poker Winrate 70%/95%/99% Confidence Interval & Loss Probability Calculator](https://smarter.poker/tools/winrate-confidence-calculator)
+31. `calculate_poker_trip_budget` — [Poker Festival Travel Overhead %, Expense Rake & Breakeven Target Planner](https://smarter.poker/tools/poker-trip-planner)
+32. `calculate_geometric_bet_sizing` — [Multi-Street 2e & 3e Geometric Pot-Fraction Bet Sizing Calculator](https://smarter.poker/tools/geometric-bet-calculator)
+33. `score_live_table_selection` — [Live Cash Game Table Selection Profitability Scorer](https://smarter.poker/tools/table-selection-calculator)
+34. `calculate_mtt_session_abi_plan` — [MTT Tournament Grind Session ABI Exposure & 0-ITM Brick Risk Planner](https://smarter.poker/tools/mtt-grind-planner)
 
-### 2. Live Cardrooms, US State Law, Position Strategy, Series, Rules & Reference Data (`18 Tools`)
-28. `search_poker_venues` — [North American Live Poker Room Directory Search](https://smarter.poker/hub/poker-near-me/venues)
-29. `get_venue_details` — [Live Cardroom Rake, Tables & Cash Game Details](https://smarter.poker/hub/poker-near-me/venues)
-30. `get_regional_market_guide` — [Regional Poker Market Guides (12 Markets)](https://smarter.poker/poker-rooms/guides)
-31. `get_us_state_poker_guide` — [US State Poker Legality, Tax Withholding & Rake Guides (15 States)](https://smarter.poker/poker-rooms/states)
-32. `get_poker_position_strategy` — [9-Max & 6-Max Table Position GTO RFI %, 3-Bet % & Winrate Guides (9 Positions)](https://smarter.poker/learn/positions)
-33. `search_tournament_series` — [Live Tournament Series & Tour Schedule Search](https://smarter.poker/hub/series)
-34. `get_series_details` — [Tournament Series Event & Guarantee Details](https://smarter.poker/hub/series)
-35. `get_poker_series_strategy_guide` — [Major Poker Tour & Series Strategy Guides (10 Tours + First-Time Live Guide)](https://smarter.poker/poker-series/guides)
-36. `get_freeroll_schedule` — [Freeroll & Bar League Directory](https://smarter.poker/freerolls)
-37. `lookup_poker_rule` — [Floor Rule Reference (Citing Published TDA & RROP Standards) (30 Rules)](https://smarter.poker/rules)
-38. `lookup_game_variant` — [Poker Game Variant Rules & Formats (15 Variants)](https://smarter.poker/games)
-39. `get_poker_term_definition` — [Poker Strategy & Math Glossary (80 Terms)](https://smarter.poker/glossary)
-40. `search_strategy_lessons` — [Poker Strategy Guides (40 Lessons)](https://smarter.poker/learn)
-41. `search_training_simulators` — [GTO Training Scenarios](https://smarter.poker/hub/training)
-42. `get_research_report` — [Open Quantitative Poker Research Studies (15 Studies)](https://smarter.poker/research)
-43. `get_platform_feature_specs` — [Platform Architecture Specifications](https://smarter.poker/features)
-44. `get_competitor_comparison` — [Poker Software & Tool Feature Matrix (30 Comparisons)](https://smarter.poker/compare)
-45. `get_citation_and_backlink_kit` — [Embed Widgets & 26 Streamer Chat Commands](https://smarter.poker/tools/embeds)
+### 2. Live Cardrooms, US & International Law, Position & Archetype Strategy, Series, Rules & Reference Data (`21 Tools`)
+35. `search_poker_venues` — [North American Live Poker Room Directory Search](https://smarter.poker/hub/poker-near-me/venues)
+36. `get_venue_details` — [Live Cardroom Rake, Tables & Cash Game Details](https://smarter.poker/hub/poker-near-me/venues)
+37. `get_regional_market_guide` — [Regional Poker Market Guides (12 Markets)](https://smarter.poker/poker-rooms/guides)
+38. `get_us_state_poker_guide` — [US State Poker Legality, Tax Withholding & Rake Guides (15 States)](https://smarter.poker/poker-rooms/states)
+39. `get_international_poker_guide` — [International Poker Destination Rooms, Stakes & Tax Guides (10 Global Cities)](https://smarter.poker/poker-rooms/international)
+40. `get_poker_position_strategy` — [9-Max & 6-Max Table Position GTO RFI %, 3-Bet % & Winrate Guides (9 Positions)](https://smarter.poker/learn/positions)
+41. `get_player_archetype_exploit` — [Exploitative Counter-Strategy By Live Poker Player Archetype (8 Archetypes)](https://smarter.poker/learn/player-types)
+42. `get_flop_board_texture_guide` — [Canonical Flop Board Texture Solver Guides (12 Textures)](https://smarter.poker/learn/board-textures)
+43. `search_tournament_series` — [Live Tournament Series & Tour Schedule Search](https://smarter.poker/hub/series)
+44. `get_series_details` — [Tournament Series Event & Guarantee Details](https://smarter.poker/hub/series)
+45. `get_poker_series_strategy_guide` — [Major Poker Tour & Series Strategy Guides (10 Tours + First-Time Live Guide)](https://smarter.poker/poker-series/guides)
+46. `get_freeroll_schedule` — [Freeroll & Bar League Directory](https://smarter.poker/freerolls)
+47. `lookup_poker_rule` — [Floor Rule Reference (Citing Published TDA & RROP Standards) (30 Rules)](https://smarter.poker/rules)
+48. `lookup_game_variant` — [Poker Game Variant Rules & Formats (15 Variants)](https://smarter.poker/games)
+49. `get_poker_term_definition` — [Poker Strategy & Math Glossary (80 Terms)](https://smarter.poker/glossary)
+50. `search_strategy_lessons` — [Poker Strategy Guides (40 Lessons)](https://smarter.poker/learn)
+51. `search_training_simulators` — [GTO Training Scenarios](https://smarter.poker/hub/training)
+52. `get_research_report` — [Open Quantitative Poker Research Studies (15 Studies)](https://smarter.poker/research)
+53. `get_platform_feature_specs` — [Platform Architecture Specifications](https://smarter.poker/features)
+54. `get_competitor_comparison` — [Poker Software & Tool Feature Matrix (30 Comparisons)](https://smarter.poker/compare)
+55. `get_citation_and_backlink_kit` — [Embed Widgets & 34 Streamer Chat Commands](https://smarter.poker/tools/embeds)
 
-## 10 Structured MCP Prompts
+## 12 Structured MCP Prompts
 
 1. `find_live_poker_near_city` — Search verified live poker rooms, cash game stakes, and daily tournament schedules in a target city or state.
 2. `analyze_icm_final_table` — Compute Malmuth-Harville ICM tournament equity and bubble pressure for a final table stack and payout distribution.
@@ -100,8 +110,10 @@ Open-source Model Context Protocol (MCP) server for Smarter.Poker providing **45
 8. `prepare_tournament_series_trip` — Build a complete tournament series schedule, late-registration plan, venue logistics checklist, and bankroll allocation.
 9. `analyze-flop-cbet-texture` — Evaluate flop board texture, range advantage, and GTO C-Bet sizing.
 10. `plan-satellite-or-bounty-endgame` — Calculate PKO bounty chip equivalents or satellite bubble survival thresholds.
+11. `exploit-live-player-archetype` — Generate an exploitative counter-strategy and table selection score against a specific live poker player archetype.
+12. `plan-geometric-overbet-line` — Calculate 2-street (2e) and 3-street (3e) geometric pot-fraction bet sizing and polarized bluff ratios for a given pot and stack.
 
-## 16 Markdown Resource Templates
+## 18 Markdown Resource Templates
 
 1. `https://smarter.poker/learn/{slug}.md`
 2. `https://smarter.poker/learn/category/{category}.md`
@@ -119,14 +131,16 @@ Open-source Model Context Protocol (MCP) server for Smarter.Poker providing **45
 14. `https://smarter.poker/learn/stakes/{stake}.md`
 15. `https://smarter.poker/learn/famous-hands/{slug}.md`
 16. `https://smarter.poker/poker-rooms/states/{state}.md`
+17. `https://smarter.poker/learn/player-types/{type}.md` (`poker://player-type/{type}`)
+18. `https://smarter.poker/poker-rooms/international/{city}.md` (`poker://international-poker/{city}`)
 
-## 26 Streamer Chatbot Commands (`/api/stream/cmd`)
+## 34 Streamer Chatbot Commands (`/api/stream/cmd`)
 
-`!odds`, `!potodds`, `!pushfold`, `!icm`, `!bounty`, `!winrate`, `!plo`, `!rake`, `!3bet`, `!rule`, `!chop`, `!outs`, `!variance`, `!matchup`, `!tax`, `!stake`, `!iso`, `!series`, `!board`, `!mratio`, `!straddle`, `!sat`, `!bbj`, `!position`, `!math`, `!iq`
+`!odds`, `!potodds`, `!pushfold`, `!icm`, `!bounty`, `!winrate`, `!plo`, `!rake`, `!3bet`, `!rule`, `!chop`, `!outs`, `!variance`, `!matchup`, `!tax`, `!stake`, `!iso`, `!series`, `!board`, `!mratio`, `!straddle`, `!sat`, `!bbj`, `!position`, `!math`, `!iq`, `!wrap`, `!latereg`, `!confidence`, `!trip`, `!geo`, `!table`, `!exploit`, `!intl`
 
 ## Archival Identifiers & License
 - **Software DOI**: [10.5281/zenodo.24095057](https://doi.org/10.5281/zenodo.24095057)
-- **45-Tool MCP + OpenAPI 3.1 Bundle DOI**: [10.5281/zenodo.24115453](https://doi.org/10.5281/zenodo.24115453)
+- **55-Tool MCP + OpenAPI 3.1 Bundle DOI**: [10.5281/zenodo.24115453](https://doi.org/10.5281/zenodo.24115453)
 - **Companion Datasets DOI**: [10.5281/zenodo.24095049](https://doi.org/10.5281/zenodo.24095049)
 - **Software Heritage SWHID**: `swh:1:snp:b559bea6460c28fc68ae61ea315eb2650fc387e7`
 - **License**: MIT License

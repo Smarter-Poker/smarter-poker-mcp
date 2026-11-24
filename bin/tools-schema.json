@@ -1612,5 +1612,356 @@
         }
       }
     }
+  },
+  {
+    "name": "calculate_plo_wrap_outs",
+    "description": "Computes 4-Card and 5-Card Pot-Limit Omaha (PLO) straight wrap outs (13, 16, 17, 20 outs), nut vs dirty outs, flush redraw bonus, and exact hypergeometric turn+river equity %.",
+    "annotations": {
+      "title": "Calculate PLO Straight Wrap Outs & Redraw Equity",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "wrap_type": {
+          "type": "string",
+          "description": "Omaha straight wrap type or out count: \"9\", \"13\", \"16\", \"17\", or \"20\" (default: \"13\").",
+          "default": "13"
+        },
+        "flush_draw": {
+          "type": "string",
+          "enum": [
+            "none",
+            "single",
+            "double"
+          ],
+          "description": "Flush redraw held alongside the wrap: \"none\", \"single\" (+7 outs), or \"double\" (+14 outs, default: \"none\").",
+          "default": "none"
+        },
+        "variant": {
+          "type": "string",
+          "enum": [
+            "plo4",
+            "plo5"
+          ],
+          "description": "Omaha game variant: \"plo4\" (45 unseen cards on flop) or \"plo5\" (44 unseen cards on flop, default: \"plo4\").",
+          "default": "plo4"
+        }
+      }
+    }
+  },
+  {
+    "name": "calculate_late_reg_icm_ev",
+    "description": "Computes tournament late-registration ICM chip appreciation, instant dollar equity of late entry at 15BB-30BB vs Level 1, and break-even post-entry ROI threshold.",
+    "annotations": {
+      "title": "Calculate Tournament Late-Registration ICM Equity Boost",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "buy_in_dollars": {
+          "type": "number",
+          "description": "Total tournament buy-in in dollars (default: 1000).",
+          "default": 1000
+        },
+        "rake_percent": {
+          "type": "number",
+          "description": "Tournament house fee / rake percentage of buy-in (default: 10).",
+          "default": 10
+        },
+        "starting_stack_bb": {
+          "type": "number",
+          "description": "Level 1 starting stack in Big Blinds (default: 200).",
+          "default": 200
+        },
+        "late_entry_stack_bb": {
+          "type": "number",
+          "description": "Stack depth in Big Blinds at late-registration entry (e.g. 15 to 30, default: 20).",
+          "default": 20
+        },
+        "field_eliminated_percent": {
+          "type": "number",
+          "description": "Percentage of total tournament field already eliminated at late-reg entry (default: 42).",
+          "default": 42
+        },
+        "paid_spots_percent": {
+          "type": "number",
+          "description": "Percentage of tournament field paid in the money (default: 15).",
+          "default": 15
+        }
+      }
+    }
+  },
+  {
+    "name": "calculate_winrate_confidence_interval",
+    "description": "Computes 70%, 95%, and 99% poker winrate confidence intervals (bb/100 or $/hr), standard error, and probability of true loss over a given hand sample.",
+    "annotations": {
+      "title": "Calculate Poker Winrate 70%/95%/99% Confidence Intervals",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "observed_winrate_bb100": {
+          "type": "number",
+          "description": "Observed or true winrate in BB/100 hands (default: 5).",
+          "default": 5
+        },
+        "std_dev_bb100": {
+          "type": "number",
+          "description": "Standard deviation in BB/100 hands (e.g. 70 live NLH, 85 online 6-max NLH, 135 PLO4, default: 85).",
+          "default": 85
+        },
+        "hands_sample": {
+          "type": "number",
+          "description": "Sample size in total hands played (default: 50000).",
+          "default": 50000
+        }
+      }
+    }
+  },
+  {
+    "name": "calculate_poker_trip_budget",
+    "description": "Computes total poker festival travel overhead (flights, hotel, food, ground transport), effective expense rake % on planned buy-ins, and break-even gross series winnings required.",
+    "annotations": {
+      "title": "Calculate Poker Trip Travel Overhead & Breakeven Target",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "nights": {
+          "type": "integer",
+          "description": "Number of hotel nights for the poker trip (default: 5).",
+          "default": 5
+        },
+        "flight_dollars": {
+          "type": "number",
+          "description": "Round-trip airfare or fuel cost in dollars (default: 450).",
+          "default": 450
+        },
+        "hotel_per_night_dollars": {
+          "type": "number",
+          "description": "Nightly hotel rate including resort fees and taxes in dollars (default: 190).",
+          "default": 190
+        },
+        "food_per_day_dollars": {
+          "type": "number",
+          "description": "Daily food and dining budget in dollars (default: 85).",
+          "default": 85
+        },
+        "ground_transport_dollars": {
+          "type": "number",
+          "description": "Rideshare, parking, and ground transport total in dollars (default: 150).",
+          "default": 150
+        },
+        "planned_buyins_dollars": {
+          "type": "number",
+          "description": "Total planned tournament buy-ins or cash game volume for the trip in dollars (default: 5000).",
+          "default": 5000
+        },
+        "expected_roi_percent": {
+          "type": "number",
+          "description": "Expected pre-expense tournament ROI % (default: 22).",
+          "default": 22
+        }
+      }
+    }
+  },
+  {
+    "name": "calculate_geometric_bet_sizing",
+    "description": "Computes multi-street 2e and 3e geometric pot-fraction bet sizing g = (((2S + P)/P)^(1/n) - 1) / 2 to put the remaining effective stack all-in smoothly by the river.",
+    "annotations": {
+      "title": "Calculate Multi-Street 2e & 3e Geometric Bet Sizing",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "pot_size": {
+          "type": "number",
+          "description": "Current pot size in chips or Big Blinds (default: 100).",
+          "default": 100
+        },
+        "effective_stack": {
+          "type": "number",
+          "description": "Remaining effective stack in chips or Big Blinds (default: 300).",
+          "default": 300
+        },
+        "streets": {
+          "type": "integer",
+          "enum": [
+            1,
+            2,
+            3
+          ],
+          "description": "Number of betting streets remaining to get all-in (1, 2, or 3, default: 3).",
+          "default": 3
+        }
+      }
+    }
+  },
+  {
+    "name": "score_live_table_selection",
+    "description": "Scores live cash game table profitability (S-Tier to F) from recreational VPIP whale count, average stack depth in BB, straddle/bomb-pot frequency, and casino rake cap.",
+    "annotations": {
+      "title": "Score Live Cash Game Table Selection Profitability",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "vpip_whales_count": {
+          "type": "integer",
+          "description": "Number of loose-passive recreational players (VPIP > 45%) at the table (0-8, default: 3).",
+          "default": 3
+        },
+        "avg_stack_bb": {
+          "type": "number",
+          "description": "Average table stack depth in Big Blinds (default: 150).",
+          "default": 150
+        },
+        "rake_cap_dollars": {
+          "type": "number",
+          "description": "Casino maximum pot rake cap in dollars (default: 5).",
+          "default": 5
+        },
+        "big_blind_dollars": {
+          "type": "number",
+          "description": "Big blind dollar value (e.g. 3 for $1/$3, 5 for $2/$5, default: 5).",
+          "default": 5
+        },
+        "straddle_or_bomb_pot_active": {
+          "type": "boolean",
+          "description": "Whether regular straddles or bomb pots are active at the table (default: true).",
+          "default": true
+        }
+      }
+    }
+  },
+  {
+    "name": "calculate_mtt_session_abi_plan",
+    "description": "Computes MTT tournament grind session total exposure, Average Buy-In (ABI) bankroll ratio, probability of a 0-ITM brick session %, and expected session EV.",
+    "annotations": {
+      "title": "Calculate MTT Session ABI Exposure & 0-ITM Brick Risk",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "tournaments_count": {
+          "type": "integer",
+          "description": "Number of MTT tournaments scheduled in the grind session (default: 12).",
+          "default": 12
+        },
+        "average_buy_in_dollars": {
+          "type": "number",
+          "description": "Average Buy-In (ABI) per tournament in dollars (default: 55).",
+          "default": 55
+        },
+        "expected_bullets_per_mtt": {
+          "type": "number",
+          "description": "Average entries/bullets fired per tournament including re-entries (default: 1.25).",
+          "default": 1.25
+        },
+        "itm_rate_percent": {
+          "type": "number",
+          "description": "Expected In-The-Money (ITM) cash rate percentage (default: 18).",
+          "default": 18
+        },
+        "expected_roi_percent": {
+          "type": "number",
+          "description": "Expected net tournament ROI percentage (default: 25).",
+          "default": 25
+        },
+        "bankroll_dollars": {
+          "type": "number",
+          "description": "Total dedicated MTT bankroll in dollars (default: 12000).",
+          "default": 12000
+        }
+      }
+    }
+  },
+  {
+    "name": "get_player_archetype_exploit",
+    "description": "Returns exploitative counter-strategy, VPIP/PFR profile, and primary leaks across 8 poker player archetypes (omc, calling-station, maniac, tag, lag, short-stack, trapper, gto-grinder).",
+    "annotations": {
+      "title": "Get Exploitative Strategy By Poker Player Archetype",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "archetype": {
+          "type": "string",
+          "description": "Player archetype slug or alias (e.g. \"omc\", \"calling-station\", \"maniac\", \"tag\", \"lag\", \"short-stack\", \"trapper\", \"gto-grinder\"). Omit to list all 8 archetypes."
+        }
+      }
+    }
+  },
+  {
+    "name": "get_flop_board_texture_guide",
+    "description": "Returns solver C-bet frequency, optimal sizing, BB check-raise %, range/nut advantage, and turn barrel plan across 12 canonical flop board textures.",
+    "annotations": {
+      "title": "Get Canonical Flop Board Texture Solver Guide",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "texture": {
+          "type": "string",
+          "description": "Canonical flop board texture slug (e.g. \"ace-high-dry-rainbow\", \"king-high-dry-rainbow\", \"double-broadway-two-tone\", \"triple-broadway-wet\", \"mid-connected-wet\", \"low-connected-board\", \"low-disconnected-rainbow\", \"monotone-flush-flop\", \"high-paired-board\", \"low-paired-board\", \"wheel-ace-low-board\", \"queen-jack-dynamic\"). Omit to list all 12 canonical textures."
+        }
+      }
+    }
+  },
+  {
+    "name": "get_international_poker_guide",
+    "description": "Returns international poker destination intelligence (flagship rooms, currency, stakes, rake caps, tax rules, and major festivals) across 10 global cities (london, barcelona, rozvadov, monte-carlo, prague, manila, macau, melbourne, montreal, nassau).",
+    "annotations": {
+      "title": "Get International Poker Destination & Tax Guide",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "city": {
+          "type": "string",
+          "description": "International city slug (e.g. \"london\", \"barcelona\", \"rozvadov\", \"monte-carlo\", \"prague\", \"manila\", \"macau\", \"melbourne\", \"montreal\", \"nassau\"). Omit to list all 10 global destinations."
+        }
+      }
+    }
   }
 ]

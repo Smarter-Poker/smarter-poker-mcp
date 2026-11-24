@@ -10,10 +10,10 @@ import {
   forwardRpc,
 } from './src/index.mjs';
 
-assert.equal(TOOLS.length, 45, `Expected 45 TOOLS, got ${TOOLS.length}`);
-assert.equal(PROMPTS.length, 10, `Expected 10 PROMPTS, got ${PROMPTS.length}`);
-assert.equal(RESOURCE_TEMPLATES.length, 16, `Expected 16 RESOURCE_TEMPLATES, got ${RESOURCE_TEMPLATES.length}`);
-assert.equal(STREAMER_COMMANDS.length, 26, `Expected 26 STREAMER_COMMANDS, got ${STREAMER_COMMANDS.length}`);
+assert.equal(TOOLS.length, 55, `Expected 55 TOOLS, got ${TOOLS.length}`);
+assert.equal(PROMPTS.length, 12, `Expected 12 PROMPTS, got ${PROMPTS.length}`);
+assert.equal(RESOURCE_TEMPLATES.length, 18, `Expected 18 RESOURCE_TEMPLATES, got ${RESOURCE_TEMPLATES.length}`);
+assert.equal(STREAMER_COMMANDS.length, 34, `Expected 34 STREAMER_COMMANDS, got ${STREAMER_COMMANDS.length}`);
 
 const newTools = [
   'analyze_flop_board_texture',
@@ -26,6 +26,16 @@ const newTools = [
   'resolve_holdem_showdown_winner',
   'get_poker_position_strategy',
   'get_us_state_poker_guide',
+  'calculate_plo_wrap_outs',
+  'calculate_late_reg_icm_ev',
+  'calculate_winrate_confidence_interval',
+  'calculate_poker_trip_budget',
+  'calculate_geometric_bet_sizing',
+  'score_live_table_selection',
+  'calculate_mtt_session_abi_plan',
+  'get_player_archetype_exploit',
+  'get_flop_board_texture_guide',
+  'get_international_poker_guide',
 ];
 
 for (const toolName of newTools) {
@@ -70,9 +80,9 @@ setTimeout(() => {
   proc.kill();
   assert.equal(responses.length, 4, `Expected 4 responses, got ${responses.length}`);
   assert.equal(responses[0].result.serverInfo.name, 'smarter-poker-mcp-server');
-  assert.equal(responses[0].result.serverInfo.version, '1.0.6');
-  assert.equal(responses[1].result.tools.length, 45);
-  assert.equal(responses[2].result.prompts.length, 10);
+  assert.equal(responses[0].result.serverInfo.version, '1.0.7');
+  assert.equal(responses[1].result.tools.length, 55);
+  assert.equal(responses[2].result.prompts.length, 12);
   assert.ok(JSON.stringify(responses[3].result).includes('pot-odds-calculator'));
   console.log('STDIO MCP TEST PASSED:', responses.length, 'tools:', responses[1].result.tools.length, 'prompts:', responses[2].result.prompts.length);
 }, 2500);

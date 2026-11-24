@@ -1,12 +1,16 @@
 #!/usr/bin/env node
 /**
- * Smarter.Poker Model Context Protocol (MCP) Server — v1.0.6
+ * Smarter.Poker Model Context Protocol (MCP) Server — v1.0.7
  *
- * Exposes 45 deterministic zero-auth poker mathematics, GTO strategy,
- * tournament ICM/M-Ratio/Satellite/Chop/Bounty solvers, US state poker law,
- * table position GTO benchmarks, North American live poker room directory,
- * tournament series schedules, and TDA floor ruling tools, plus 10 structured
- * prompt workflows, 16 resource templates, and 26 streamer chatbot commands.
+ * Exposes 55 deterministic zero-auth poker mathematics, GTO strategy,
+ * tournament ICM/M-Ratio/Satellite/Chop/Bounty/Late-Reg/ABI solvers, PLO wrap
+ * & 3x+pot calculators, geometric bet sizing, winrate confidence intervals,
+ * live table selection & trip budget planners, player archetype exploits,
+ * canonical flop board texture guides, US state poker law, international poker
+ * destination guides, table position GTO benchmarks, North American live poker
+ * room directory, tournament series schedules, and TDA floor ruling tools,
+ * plus 12 structured prompt workflows, 18 resource templates, and 34 streamer
+ * chatbot commands.
  */
 
 import fs from 'node:fs';
@@ -17,7 +21,7 @@ export const REMOTE_ENDPOINT = process.env.SMARTER_POKER_MCP_URL || 'https://sma
 
 export const SERVER_INFO = {
   name: 'smarter-poker-mcp-server',
-  version: '1.0.6',
+  version: '1.0.7',
 };
 export const MCP_SERVER_INFO = SERVER_INFO;
 
@@ -132,6 +136,23 @@ export const PROMPTS = [
       { name: 'seats_awarded', description: 'Satellite seats awarded (e.g. "10")', required: false },
     ],
   },
+  {
+    name: 'exploit-live-player-archetype',
+    description: 'Generate an exploitative counter-strategy and table selection score against a specific live poker player archetype',
+    arguments: [
+      { name: 'archetype', description: 'Player archetype slug (e.g. "omc", "calling-station", "maniac", "tag", "lag", "short-stack", "trapper", "gto-grinder")', required: true },
+      { name: 'stakes', description: 'Cash game stakes (e.g. "$1/$3" or "$2/$5")', required: false },
+    ],
+  },
+  {
+    name: 'plan-geometric-overbet-line',
+    description: 'Calculate 2-street (2e) and 3-street (3e) geometric pot-fraction bet sizing and polarized bluff ratios for a given pot and stack',
+    arguments: [
+      { name: 'pot_size', description: 'Current pot size in BB or dollars (e.g. "100")', required: true },
+      { name: 'effective_stack', description: 'Remaining effective stack in BB or dollars (e.g. "300")', required: true },
+      { name: 'streets', description: 'Number of betting streets remaining: "2" or "3"', required: false },
+    ],
+  },
 ];
 export const MCP_PROMPTS = PROMPTS;
 
@@ -205,7 +226,7 @@ export const RESOURCE_TEMPLATES = [
   {
     uriTemplate: 'https://smarter.poker/tools/{calculator}.md',
     name: 'Smarter.Poker Interactive Poker Math Calculator Markdown',
-    description: 'Raw Markdown mathematical specification and benchmark tables for any of the 34 free interactive poker calculators.',
+    description: 'Raw Markdown mathematical specification and benchmark tables for any of the 42 free interactive poker calculators.',
     mimeType: 'text/markdown',
   },
   {
@@ -232,6 +253,18 @@ export const RESOURCE_TEMPLATES = [
     description: 'Raw Markdown legal status, minimum age, state tax withholding, rake model, and top poker rooms for US states.',
     mimeType: 'text/markdown',
   },
+  {
+    uriTemplate: 'https://smarter.poker/learn/player-types/{type}.md',
+    name: 'Smarter.Poker Player Archetype Exploitative Strategy Guide Markdown',
+    description: 'Raw Markdown VPIP/PFR profile, core leaks, and exploitative counter-strategy for any of the 8 poker player archetypes.',
+    mimeType: 'text/markdown',
+  },
+  {
+    uriTemplate: 'https://smarter.poker/poker-rooms/international/{city}.md',
+    name: 'Smarter.Poker International Poker Destination & Tax Guide Markdown',
+    description: 'Raw Markdown flagship venues, currency, stakes, rake caps, tax rules, and major festivals across 10 international poker cities.',
+    mimeType: 'text/markdown',
+  },
 ];
 export const MCP_RESOURCE_TEMPLATES = RESOURCE_TEMPLATES;
 
@@ -239,7 +272,8 @@ export const STREAMER_COMMANDS = [
   '!odds', '!potodds', '!pushfold', '!icm', '!bounty', '!winrate', '!plo',
   '!rake', '!3bet', '!rule', '!chop', '!outs', '!variance', '!matchup',
   '!tax', '!stake', '!iso', '!series', '!board', '!mratio', '!straddle',
-  '!sat', '!bbj', '!position', '!math', '!iq',
+  '!sat', '!bbj', '!position', '!math', '!iq', '!wrap', '!latereg',
+  '!confidence', '!trip', '!geo', '!table', '!exploit', '!intl',
 ];
 
 function parseCardSimple(token) {
@@ -637,6 +671,198 @@ export function computeLocalFallback(rawName, args = {}) {
       canonical_url: `${base}/poker-rooms/states/${state}`,
     };
   }
+  if (name === 'calculate_plo_wrap_outs') {
+    const wrapTypeRaw = String(args.wrap_type || args.outs || '13').toLowerCase();
+    const wrapCatalog = {
+      '9': { outs: 9, nut_outs: 6, dirty_outs: 3, label: '9-Out Inside Wrap / OESD + Gutshot' },
+      '13': { outs: 13, nut_outs: 10, dirty_outs: 3, label: '13-Out Classic 3-Card Around 2-Card Omaha Wrap' },
+      '16': { outs: 16, nut_outs: 12, dirty_outs: 4, label: '16-Out Inside Broadway / Connected Wrap' },
+      '17': { outs: 17, nut_outs: 14, dirty_outs: 3, label: '17-Out High-Nut Open Wrap' },
+      '20': { outs: 20, nut_outs: 14, dirty_outs: 6, label: '20-Out Maximum 4-Card Around 2-Card Monster Wrap' },
+    };
+    const matchedKey = Object.keys(wrapCatalog).find((k) => wrapTypeRaw.includes(k)) || '13';
+    const spec = wrapCatalog[matchedKey];
+    const flushDrawType = String(args.flush_draw || (args.has_flush_draw ? 'single' : 'none')).toLowerCase();
+    const extraFlushOuts = flushDrawType === 'double' || flushDrawType === 'ds' ? 14 : flushDrawType === 'single' || flushDrawType === 'fd' ? 7 : 0;
+    const totalUniqueOuts = Math.min(25, spec.outs + extraFlushOuts);
+    const unseenFlop = String(args.variant || 'plo4').toLowerCase() === 'plo5' ? 44 : 45;
+    const unseenTurn = unseenFlop - 1;
+    const turnHitPct = Number(((totalUniqueOuts / unseenFlop) * 100).toFixed(1));
+    const riverHitPct = Number(((totalUniqueOuts / unseenTurn) * 100).toFixed(1));
+    const flopToRiverEquityPct = Number(((1 - ((unseenFlop - totalUniqueOuts) / unseenFlop) * ((unseenTurn - totalUniqueOuts) / unseenTurn)) * 100).toFixed(1));
+    return {
+      tool: name,
+      variant: String(args.variant || 'plo4').toLowerCase(),
+      wrap_label: spec.label,
+      straight_wrap_outs: spec.outs,
+      nut_straight_outs: spec.nut_outs,
+      non_nut_dirty_outs: spec.dirty_outs,
+      flush_redraw_type: flushDrawType,
+      extra_clean_flush_outs: extraFlushOuts,
+      total_unique_outs: totalUniqueOuts,
+      turn_completion_percent: turnHitPct,
+      river_completion_percent: riverHitPct,
+      flop_to_river_completion_percent: flopToRiverEquityPct,
+      canonical_url: `${base}/tools/plo-outs-calculator`,
+    };
+  }
+  if (name === 'calculate_late_reg_icm_ev') {
+    const buyInDollars = Math.max(10, Number(args.buy_in_dollars ?? args.buyin) || 1000);
+    const rakePercent = Math.max(0, Math.min(30, Number(args.rake_percent ?? 10)));
+    const startingStackBb = Math.max(20, Number(args.starting_stack_bb ?? 200));
+    const lateEntryStackBb = Math.max(5, Math.min(startingStackBb, Number(args.late_entry_stack_bb ?? args.entry_bb) || 20));
+    const fieldEliminatedPct = Math.max(5, Math.min(85, Number(args.field_eliminated_percent ?? 42)));
+    const paidSpotsPct = Math.max(10, Math.min(25, Number(args.paid_spots_percent ?? 15)));
+    const netPoolPerEntry = Number((buyInDollars * (1 - rakePercent / 100)).toFixed(2));
+    const remainingFieldRatio = 1 - fieldEliminatedPct / 100;
+    const icmAppreciationMultiplier = Number((1 / Math.pow(remainingFieldRatio, 0.24)).toFixed(4));
+    const lateEntryInstantIcmDollars = Number((netPoolPerEntry * icmAppreciationMultiplier).toFixed(2));
+    return {
+      tool: name,
+      buy_in_dollars: buyInDollars,
+      rake_percent: rakePercent,
+      level_1_starting_stack_bb: startingStackBb,
+      late_reg_entry_stack_bb: lateEntryStackBb,
+      field_eliminated_percent: fieldEliminatedPct,
+      paid_spots_percent: paidSpotsPct,
+      icm_chip_appreciation_multiplier: icmAppreciationMultiplier,
+      late_reg_instant_icm_equity_dollars: lateEntryInstantIcmDollars,
+      is_plus_ev_before_a_single_hand: lateEntryInstantIcmDollars > buyInDollars,
+      canonical_url: `${base}/tools/late-reg-calculator`,
+    };
+  }
+  if (name === 'calculate_winrate_confidence_interval') {
+    const observedWr = Number(args.observed_winrate_bb100 ?? args.winrate_bb100 ?? 5);
+    const stdDevBb100 = Math.max(10, Number(args.std_dev_bb100 ?? 85));
+    const handsSample = Math.max(500, Number(args.hands_sample ?? args.hands ?? 50000));
+    const chunks100 = handsSample / 100;
+    const standardErrorBb100 = Number((stdDevBb100 / Math.sqrt(chunks100)).toFixed(2));
+    return {
+      tool: name,
+      observed_winrate_bb100: observedWr,
+      std_dev_bb100: stdDevBb100,
+      hands_sample: handsSample,
+      standard_error_bb100: standardErrorBb100,
+      confidence_interval_70_bb100: [Number((observedWr - 1.04 * standardErrorBb100).toFixed(2)), Number((observedWr + 1.04 * standardErrorBb100).toFixed(2))],
+      confidence_interval_95_bb100: [Number((observedWr - 1.96 * standardErrorBb100).toFixed(2)), Number((observedWr + 1.96 * standardErrorBb100).toFixed(2))],
+      confidence_interval_99_bb100: [Number((observedWr - 2.58 * standardErrorBb100).toFixed(2)), Number((observedWr + 2.58 * standardErrorBb100).toFixed(2))],
+      canonical_url: `${base}/tools/winrate-confidence-calculator`,
+    };
+  }
+  if (name === 'calculate_poker_trip_budget') {
+    const nights = Math.max(1, Math.round(Number(args.nights) || 5));
+    const flightDollars = Math.max(0, Number(args.flight_dollars ?? 450));
+    const hotelPerNightDollars = Math.max(0, Number(args.hotel_per_night_dollars ?? 190));
+    const foodPerDayDollars = Math.max(0, Number(args.food_per_day_dollars ?? 85));
+    const transportDollars = Math.max(0, Number(args.ground_transport_dollars ?? 150));
+    const plannedBuyInsDollars = Math.max(200, Number(args.planned_buyins_dollars ?? args.buyins ?? 5000));
+    const expectedRoiPct = Number(args.expected_roi_percent ?? 22);
+    const totalTravelOverheadDollars = Math.round(flightDollars + nights * hotelPerNightDollars + (nights + 1) * foodPerDayDollars + transportDollars);
+    const effectiveOverheadRakePct = Number(((totalTravelOverheadDollars / plannedBuyInsDollars) * 100).toFixed(2));
+    const grossExpectedProfitDollars = Math.round(plannedBuyInsDollars * (expectedRoiPct / 100));
+    const netTripEvAfterExpensesDollars = grossExpectedProfitDollars - totalTravelOverheadDollars;
+    return {
+      tool: name,
+      nights,
+      total_travel_overhead_dollars: totalTravelOverheadDollars,
+      planned_tournament_or_cash_buyins_dollars: plannedBuyInsDollars,
+      effective_expense_overhead_rake_percent: effectiveOverheadRakePct,
+      net_trip_ev_after_expenses_dollars: netTripEvAfterExpensesDollars,
+      breakeven_gross_winnings_required_dollars: plannedBuyInsDollars + totalTravelOverheadDollars,
+      canonical_url: `${base}/tools/poker-trip-planner`,
+    };
+  }
+  if (name === 'calculate_geometric_bet_sizing') {
+    const potSize = Math.max(1, Number(args.pot_size ?? args.pot) || 100);
+    const effectiveStack = Math.max(1, Number(args.effective_stack ?? args.stack) || 300);
+    const streets = Math.max(1, Math.min(3, Math.round(Number(args.streets) || 3)));
+    const spr = Number((effectiveStack / potSize).toFixed(2));
+    const growthFactor = Math.pow((2 * effectiveStack + potSize) / potSize, 1 / streets);
+    const geoPotFraction = (growthFactor - 1) / 2;
+    const geoPercentOfPot = Number((geoPotFraction * 100).toFixed(1));
+    return {
+      tool: name,
+      pot_size: potSize,
+      effective_stack: effectiveStack,
+      stack_to_pot_ratio_spr: spr,
+      streets_remaining: streets,
+      geometric_notation: `${streets}e`,
+      geometric_bet_percent_of_pot: geoPercentOfPot,
+      canonical_url: `${base}/tools/geometric-bet-calculator`,
+    };
+  }
+  if (name === 'score_live_table_selection') {
+    const vpipWhalesCount = Math.max(0, Math.min(8, Math.round(Number(args.vpip_whales_count ?? args.whales) || 3)));
+    const avgStackBb = Math.max(30, Number(args.avg_stack_bb ?? args.stack_bb) || 150);
+    const rakeCapDollars = Math.max(0, Number(args.rake_cap_dollars ?? args.rake_cap) || 5);
+    const bigBlindDollars = Math.max(1, Number(args.big_blind_dollars ?? 5));
+    const straddleOrBombPotActive = Boolean(args.straddle_or_bomb_pot_active ?? true);
+    const rakeCapBb = Number((rakeCapDollars / bigBlindDollars).toFixed(2));
+    const rawScore = Math.min(
+      100,
+      Math.max(
+        5,
+        Math.round(
+          vpipWhalesCount * 22 +
+            Math.min(30, (avgStackBb / 200) * 25) +
+            (straddleOrBombPotActive ? 14 : 0) -
+            Math.min(25, rakeCapBb * 8)
+        )
+      )
+    );
+    return {
+      tool: name,
+      vpip_whales_count: vpipWhalesCount,
+      average_table_stack_bb: avgStackBb,
+      table_profitability_score_100: rawScore,
+      canonical_url: `${base}/tools/table-selection-calculator`,
+    };
+  }
+  if (name === 'calculate_mtt_session_abi_plan') {
+    const mttCount = Math.max(1, Math.round(Number(args.tournaments_count ?? args.tournaments) || 12));
+    const averageBuyInDollars = Math.max(1, Number(args.average_buy_in_dollars ?? args.abi) || 55);
+    const expectedBulletsPerMtt = Math.max(1, Number(args.expected_bullets_per_mtt ?? 1.25));
+    const itmRatePct = Math.max(5, Math.min(40, Number(args.itm_rate_percent ?? 18)));
+    const expectedRoiPct = Number(args.expected_roi_percent ?? 25);
+    const totalBankrollDollars = Math.max(100, Number(args.bankroll_dollars ?? 12000));
+    const totalEntries = Number((mttCount * expectedBulletsPerMtt).toFixed(1));
+    const totalSessionExposureDollars = Math.round(totalEntries * averageBuyInDollars);
+    const zeroItmBrickProbPct = Number((Math.pow(1 - itmRatePct / 100, mttCount) * 100).toFixed(2));
+    return {
+      tool: name,
+      tournaments_scheduled: mttCount,
+      average_buy_in_abi_dollars: averageBuyInDollars,
+      total_session_exposure_dollars: totalSessionExposureDollars,
+      probability_of_zero_cashes_brick_session_percent: zeroItmBrickProbPct,
+      expected_session_ev_profit_dollars: Math.round(totalSessionExposureDollars * (expectedRoiPct / 100)),
+      total_bankroll_dollars: totalBankrollDollars,
+      canonical_url: `${base}/tools/mtt-grind-planner`,
+    };
+  }
+  if (name === 'get_player_archetype_exploit') {
+    const archetype = String(args.archetype || args.type || 'omc').trim().toLowerCase();
+    return {
+      tool: name,
+      archetype,
+      canonical_url: `${base}/learn/player-types/${archetype}`,
+    };
+  }
+  if (name === 'get_flop_board_texture_guide') {
+    const texture = String(args.texture || args.slug || 'ace-high-dry-rainbow').trim().toLowerCase();
+    return {
+      tool: name,
+      texture,
+      canonical_url: `${base}/learn/board-textures/${texture}`,
+    };
+  }
+  if (name === 'get_international_poker_guide') {
+    const city = String(args.city || args.slug || 'london').trim().toLowerCase();
+    return {
+      tool: name,
+      city,
+      canonical_url: `${base}/poker-rooms/international/${city}`,
+    };
+  }
   return {
     tool: name,
     canonicalUrl: `${base}/tools`,
@@ -685,7 +911,7 @@ export async function forwardRpc(message, { offlineOnly = false } = {}) {
         },
         serverInfo: SERVER_INFO,
         instructions:
-          'Smarter.Poker MCP Server v1.0.6 (45 read-only, deterministic poker mathematics, GTO strategy, cardroom directory, US state law, position benchmarks, and TDA rules tools; 10 prompts; 16 resource templates; 26 streamer commands).',
+          'Smarter.Poker MCP Server v1.0.7 (55 read-only, deterministic poker mathematics, GTO strategy, cardroom directory, US state law, international poker destinations, player archetype exploits, position benchmarks, and TDA rules tools; 12 prompts; 18 resource templates; 34 streamer commands).',
       },
     };
   }
